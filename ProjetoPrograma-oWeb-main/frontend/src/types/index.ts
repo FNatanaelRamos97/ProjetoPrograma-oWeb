@@ -12,7 +12,7 @@ export interface User {
   id: number
   name: string
   email: string
-  role: 'cliente' | 'prestador' | 'admin'
+  role: 'cliente' | 'prestador' | 'prestador_pendente' | 'admin'
 }
 
 export interface ChatMessage {

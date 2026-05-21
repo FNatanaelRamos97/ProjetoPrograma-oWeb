@@ -222,30 +222,6 @@
 
 /* ── Favorite ── */
 
-.favBtn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #cbd5e1;
-  cursor: pointer;
-  padding: 4px;
-  transition: all 0.2s;
-  line-height: 1;
-}
-
-.favBtn:hover {
-  transform: scale(1.2);
-  color: #94a3b8;
-}
-
-.favActive {
-  color: #ef4444;
-}
-
-.favActive:hover {
-  color: #dc2626;
-}
-
 /* ── Card Text ── */
 
 .cardName {

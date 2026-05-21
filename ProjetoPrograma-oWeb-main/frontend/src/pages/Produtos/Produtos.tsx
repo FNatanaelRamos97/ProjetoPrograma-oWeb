@@ -35,7 +35,6 @@ export default function Produtos() {
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [sort, setSort] = useState<SortOption>('recent')
   const [sortOpen, setSortOpen] = useState(false)
-  const [favorites, setFavorites] = useState<Set<number>>(new Set())
 
   const category = searchParams.get('cat') || ''
 
@@ -76,16 +75,6 @@ export default function Produtos() {
     if (ok) {
       setServices(prev => prev.filter(s => s.id !== id))
     }
-  }
-
-  const toggleFavorite = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setFavorites(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
   }
 
   const sortLabels: Record<SortOption, string> = {
@@ -149,7 +138,6 @@ export default function Produtos() {
           <div className={styles.grid}>
             {filtered.map((item, i) => {
               const rating = getRating(item.id)
-              const isFav = favorites.has(item.id)
               return (
                 <div
                   key={item.id}
@@ -159,9 +147,6 @@ export default function Produtos() {
                 >
                   <div className={styles.cardTop}>
                     <div className={styles.cardIcon}>{getCategoryIcon(item.name)}</div>
-                    <button className={`${styles.favBtn} ${isFav ? styles.favActive : ''}`} onClick={(e) => toggleFavorite(item.id, e)}>
-                      {isFav ? '♥' : '♡'}
-                    </button>
                   </div>
 
                   <h3 className={styles.cardName}>{item.name}</h3>

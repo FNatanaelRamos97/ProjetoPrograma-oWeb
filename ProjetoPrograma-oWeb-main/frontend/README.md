@@ -1,73 +1,69 @@
-# React + TypeScript + Vite
+# ConectServ — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface do marketplace de serviços ConectServ, construída com React + Vite + TypeScript.
 
-Currently, two official plugins are available:
+## Como executar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+# Instalar dependências
+npm install
 
-## React Compiler
+# Iniciar servidor de desenvolvimento
+npm run dev
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build de produção
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+O frontend roda em `http://localhost:5173` e se comunica com o backend em `http://localhost:3333`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Estrutura do projeto
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+frontend/
+├── public/                     # Assets estáticos (favicon, ícones PNG)
+├── src/
+│   ├── components/             # Componentes reutilizáveis
+│   │   └── NavBar/             # Barra de navegação principal
+│   ├── contexts/               # Contextos React (AuthContext)
+│   ├── pages/                  # Páginas da aplicação
+│   │   ├── Admin/              # Painel administrativo
+│   │   ├── CadastroServico/    # Cadastro de serviço
+│   │   ├── Chat/               # Mensagens
+│   │   ├── Configuracoes/      # Configurações do usuário
+│   │   ├── Hub/                # Página inicial
+│   │   ├── Login/              # Login e registro
+│   │   ├── MeusPedidos/        # Meus pedidos
+│   │   ├── Pagamento/          # Pagamento
+│   │   ├── PagamentoRealizado/ # Confirmação de pagamento
+│   │   ├── Perfil/             # Perfil do usuário
+│   │   ├── PIX/                # Pagamento via PIX
+│   │   ├── Profissionais/      # Lista de profissionais
+│   │   ├── Produtos/           # Lista de serviços (Explorar)
+│   │   ├── SobreConectServ/    # Sobre a plataforma
+│   │   ├── TornarSePrestador/  # Onboarding para prestador
+│   │   └── VerDetalhes/        # Detalhes do serviço
+│   ├── types/                  # Tipos TypeScript
+│   └── styles/                 # Estilos globais
+├── index.html
+├── vite.config.ts
+└── package.json
+```
+
+## Design System
+
+- Background escuro: gradiente navy (#071B45 → #102B58)
+- Azul principal: #2563FF
+- Verde: #10B981 / #00B96B
+- Cards: fundo branco ou glassmorphism suave
+- Inputs: 54px height, 14px border-radius
+- Fonte: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto
+
+## Funcionalidades
+
+- Autenticação (cliente, prestador, admin)
+- Cadastro e listagem de serviços
+- Perfil com nível e progresso
+- Solicitação para tornar-se prestador (role: prestador_pendente)
+- Painel admin com gráficos e métricas
+- Chat, pagamento PIX, meus pedidos

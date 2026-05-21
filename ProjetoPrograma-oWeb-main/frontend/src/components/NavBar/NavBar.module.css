@@ -388,6 +388,12 @@
   color: #ef4444;
 }
 
+.dropdownItemDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .dropdownItemIcon {
   width: 20px;
   height: 20px;

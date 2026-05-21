@@ -23,7 +23,7 @@ interface NavBarProps {
 export default function NavBar({ navItems: customNavItems }: NavBarProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, isPrestador, isAdmin, logout } = useAuth()
+  const { user, isPrestador, isAdmin, isPrestadorPendente, logout } = useAuth()
   const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
@@ -83,7 +83,7 @@ export default function NavBar({ navItems: customNavItems }: NavBarProps) {
                 </button>
               )
             })}
-            {isPrestador && (
+            {(isPrestador || isAdmin) && (
               <button
                 className={`${styles.link} ${location.pathname === '/cadastrar-servico' ? styles.linkActive : ''}`}
                 onClick={() => navigate('/cadastrar-servico')}
@@ -167,12 +167,6 @@ export default function NavBar({ navItems: customNavItems }: NavBarProps) {
                     </span>
                     Meus Pedidos
                   </button>
-                  <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/explorar') }}>
-                    <span className={styles.dropdownItemIcon}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" /></svg>
-                    </span>
-                    Favoritos
-                  </button>
                   <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/chat') }}>
                     <span className={styles.dropdownItemIcon}>
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
@@ -198,13 +192,37 @@ export default function NavBar({ navItems: customNavItems }: NavBarProps) {
                     </span>
                     Ajuda e Suporte
                   </button>
-                  {isAdmin && (
-                    <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/admin') }}>
+                  {user.role === 'cliente' && (
+                    <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/tornar-se-prestador') }}>
                       <span className={styles.dropdownItemIcon}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></svg>
                       </span>
-                      Painel Admin
+                      ✨ Tornar-se prestador
                     </button>
+                  )}
+                  {isPrestadorPendente && (
+                    <button className={`${styles.dropdownItem} ${styles.dropdownItemDisabled}`} disabled>
+                      <span className={styles.dropdownItemIcon}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                      </span>
+                      ⏳ Solicitação em análise
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <>
+                      <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/admin') }}>
+                        <span className={styles.dropdownItemIcon}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                        </span>
+                        Painel Admin
+                      </button>
+                      <button className={styles.dropdownItem} onClick={() => { setProfileOpen(false); navigate('/cadastrar-servico') }}>
+                        <span className={styles.dropdownItemIcon}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        </span>
+                        Cadastrar Serviço
+                      </button>
+                    </>
                   )}
                   <div className={styles.dropdownDivider} />
                   <button className={`${styles.dropdownItem} ${styles.dropdownLogout}`} onClick={handleLogout}>

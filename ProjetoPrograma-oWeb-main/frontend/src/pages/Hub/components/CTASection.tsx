@@ -17,8 +17,8 @@ export default function CTASection() {
       <p className={styles.desc}>
         Publique sua solicitação e receba orçamentos de profissionais qualificados.
       </p>
-      <button className={styles.btn} onClick={() => navigate('/cadastrar-servico')}>
-        Publicar solicitação
+      <button className={styles.btn} onClick={() => navigate('/explorar')}>
+        Explorar
       </button>
     </aside>
   )

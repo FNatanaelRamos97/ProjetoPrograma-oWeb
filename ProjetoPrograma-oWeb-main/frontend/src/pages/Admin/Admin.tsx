@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import NavBar from "../../components/NavBar/NavBar";
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area,
@@ -95,70 +94,12 @@ const metrics = [
   },
 ];
 
-const topNavItems = [
-  { id: "gestao", label: "Gestão" },
-  { id: "produtos", label: "Produtos", route: "/produtos" },
-  { id: "agenda", label: "Agenda", route: "/agenda" },
-  { id: "sobre", label: "Sobre", route: "/quem-somos" },
-  { id: "perfil", label: "Perfil", route: "/perfil" },
-  { id: "sair", label: "Sair" },
-];
-
 export default function Admin() {
   const [activeSidebar, setActiveSidebar] = useState("painel");
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const handleTopNav = (item: typeof topNavItems[number]) => {
-    if (item.id === "sair") {
-      logout();
-      navigate("/");
-    } else if (item.route) {
-      navigate(item.route);
-    }
-  };
 
   return (
     <div className={styles.wrapper}>
-      {/* TOP NAVBAR */}
-      <header className={styles.topNav}>
-        <div className={styles.topNavLeft}>
-          <button className={styles.logo} onClick={() => navigate("/hub")}>
-            <svg className={styles.logoIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-            ConectServ
-          </button>
-          <nav className={styles.topNavMenu}>
-            {topNavItems.map((item) => (
-              <button
-                key={item.id}
-                className={`${styles.topNavLink} ${item.id === "gestao" ? styles.topNavLinkActive : ""}`}
-                onClick={() => handleTopNav(item)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-        <div className={styles.topNavRight}>
-          <button className={styles.topNavIconBtn} title="Buscar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-              <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-            </svg>
-          </button>
-          <button className={styles.topNavIconBtn} title="Notificações">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 01-3.46 0" />
-            </svg>
-            <span className={styles.notifBadge}>4</span>
-          </button>
-          <div className={styles.adminAvatar}>A</div>
-        </div>
-      </header>
+      <NavBar />
 
       <div className={styles.body}>
         {/* SIDEBAR */}
