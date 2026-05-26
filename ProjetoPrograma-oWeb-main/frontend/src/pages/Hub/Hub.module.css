@@ -1,0 +1,26 @@
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 40%, #162544 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bgGlow {
+  position: fixed;
+  top: -300px;
+  right: -200px;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  position: relative;
+  z-index: 1;
+}

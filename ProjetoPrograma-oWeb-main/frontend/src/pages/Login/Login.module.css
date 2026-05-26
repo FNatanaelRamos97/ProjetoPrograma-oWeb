@@ -1,0 +1,384 @@
+.page {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2563eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bgCircle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 0.08s ease-out;
+}
+
+.bgCircle1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #3b82f6 0%, #2563eb 100%);
+  top: -200px;
+  right: -200px;
+  opacity: 0.15;
+  filter: blur(60px);
+  transform: translate(
+    calc((var(--mouse-x, 0.5) - 0.5) * 50px),
+    calc((var(--mouse-y, 0.5) - 0.5) * 50px)
+  );
+}
+
+.bgCircle2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #60a5fa 0%, #3b82f6 100%);
+  bottom: -100px;
+  left: -100px;
+  opacity: 0.12;
+  filter: blur(60px);
+  transform: translate(
+    calc((var(--mouse-x, 0.5) - 0.5) * 80px),
+    calc((var(--mouse-y, 0.5) - 0.5) * 80px)
+  );
+}
+
+.bgCircle3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #a78bfa 0%, #7c3aed 100%);
+  top: 60%;
+  left: 20%;
+  opacity: 0.10;
+  filter: blur(70px);
+  transform: translate(
+    calc((var(--mouse-x, 0.5) - 0.5) * 110px),
+    calc((var(--mouse-y, 0.5) - 0.5) * 110px)
+  );
+}
+
+.bgCircle4 {
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #f472b6 0%, #ec4899 100%);
+  top: 15%;
+  right: 30%;
+  opacity: 0.09;
+  filter: blur(50px);
+  transform: translate(
+    calc((var(--mouse-x, 0.5) - 0.5) * 140px),
+    calc((var(--mouse-y, 0.5) - 0.5) * 140px)
+  );
+}
+
+.bgGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 300px at
+      calc(var(--mouse-x, 0.5) * 100%)
+      calc(var(--mouse-y, 0.5) * 100%),
+    rgba(96, 165, 250, 0.08),
+    transparent 60%
+  );
+  transition: background 0.15s ease-out;
+}
+
+.bgParticles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bgParticles::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 3% 8%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2.5px 2.5px at 8% 35%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 12% 72%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 18% 55%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2.5px 2.5px at 22% 15%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1.5px 1.5px at 28% 88%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 33% 42%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2.5px 2.5px at 38% 68%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1.5px 1.5px at 42% 5%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(2px 2px at 48% 50%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2.5px 2.5px at 52% 92%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 58% 25%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(2px 2px at 63% 78%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2.5px 2.5px at 68% 12%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 73% 62%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(2px 2px at 78% 38%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2.5px 2.5px at 83% 82%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 88% 18%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(2px 2px at 93% 48%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(2.5px 2.5px at 97% 95%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 5% 45%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 10% 96%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(2.5px 2.5px at 16% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 25% 65%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2px 2px at 35% 30%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(2.5px 2.5px at 45% 85%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 55% 10%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 65% 58%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(2.5px 2.5px at 75% 98%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.5px 1.5px at 85% 28%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(2px 2px at 95% 72%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2.5px 2.5px at 2% 60%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 30% 3%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 60% 42%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2.5px 2.5px at 90% 52%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1.5px 1.5px at 15% 78%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 40% 22%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2.5px 2.5px at 70% 8%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1.5px 1.5px at 50% 75%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(2px 2px at 80% 48%, rgba(255,255,255,0.3), transparent);
+  animation: particleFloat 8s ease-in-out infinite alternate;
+}
+
+.bgParticles::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 4% 18%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 14% 63%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 20% 33%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 36% 90%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 44% 10%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 56% 70%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 66% 40%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 76% 85%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 84% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 92% 55%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 6% 50%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 24% 5%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 32% 76%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 46% 28%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 54% 95%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 64% 13%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 74% 62%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 82% 38%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 90% 82%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 98% 22%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 11% 42%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 39% 58%, rgba(255,255,255,0.2), transparent),
+    radial-gradient(1px 1px at 59% 6%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 69% 88%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 79% 30%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 87% 68%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 7% 98%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 27% 48%, rgba(255,255,255,0.3), transparent);
+  animation: particleFloat 8s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0) scale(1); opacity: 0.5; }
+  100% { transform: translateY(-40px) scale(1.15); opacity: 1; }
+}
+
+.card {
+  position: relative;
+  width: 90%;
+  max-width: 432px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  padding: var(--space-xl) var(--space-lg);
+  z-index: 1;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.title {
+  color: var(--text-light);
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: var(--space-xs);
+}
+
+.hint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.4;
+}
+
+.input {
+  width: 100%;
+  max-width: 360px;
+  height: 50px;
+  background: var(--input-bg);
+  border: none;
+  border-radius: var(--space-md);
+  padding: 0 18px;
+  font-size: 16px;
+  outline: none;
+  color: var(--text-dark);
+  transition: box-shadow 0.2s;
+}
+
+.input:focus {
+  box-shadow: 0 0 0 2px var(--btn-action);
+}
+
+.btn {
+  width: 100%;
+  max-width: 200px;
+  height: 56px;
+  background: var(--btn-action);
+  color: var(--text-light);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: var(--space-xs);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  background: var(--btn-action-hover);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.linkRow {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--btn-action-hover);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.linkBtn:hover {
+  color: var(--text-light);
+}
+
+.error {
+  color: #ff5252;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: var(--space-sm);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.errorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff5252;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.inputError {
+  box-shadow: 0 0 0 2px #ff5252 !important;
+}
+
+.cardShake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.fieldWrapper {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.passwordStrength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strengthBar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 2px;
+  background: #a78bfa;
+  transition: width 0.2s ease;
+}
+
+.strengthWeak {
+  font-size: 11px;
+  color: #ff5252;
+  white-space: nowrap;
+}
+
+.strengthOk {
+  font-size: 11px;
+  color: #22c55e;
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .card {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .input {
+    max-width: none;
+  }
+
+  .fieldWrapper {
+    max-width: none;
+  }
+
+  .btn {
+    max-width: none;
+  }
+}

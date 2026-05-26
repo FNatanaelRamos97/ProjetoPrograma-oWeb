@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1778988435283,
+      "tag": "0000_youthful_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1779230858377,
+      "tag": "0001_mature_surge",
+      "breakpoints": true
+    }
+  ]
+}
