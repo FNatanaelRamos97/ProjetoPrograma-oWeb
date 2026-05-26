@@ -2,22 +2,41 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
 
+type UserRole = "cliente" | "prestador" | "prestador_pendente" | "admin";
+
 type CreateUserRepositoryDTO = {
   name: string;
   email: string;
   passwordHash: string;
-  role: "cliente" | "prestador";
+  phone?: string;
+  identity?: string;
+  facebook?: string;
+  profileImageUrl?: string | null;
+  role?: UserRole;
 };
 
 export class UsersRepository {
   async create(data: CreateUserRepositoryDTO) {
     const result = await db
       .insert(users)
-      .values(data)
+      .values({
+        name: data.name,
+        email: data.email,
+        passwordHash: data.passwordHash,
+        phone: data.phone,
+        identity: data.identity,
+        facebook: data.facebook,
+        profileImageUrl: data.profileImageUrl ?? null,
+        role: data.role ?? "cliente"
+      })
       .returning({
         id: users.id,
         name: users.name,
         email: users.email,
+        phone: users.phone,
+        identity: users.identity,
+        facebook: users.facebook,
+        profileImageUrl: users.profileImageUrl,
         role: users.role,
         createdAt: users.createdAt
       });
@@ -40,6 +59,10 @@ export class UsersRepository {
         id: users.id,
         name: users.name,
         email: users.email,
+        phone: users.phone,
+        identity: users.identity,
+        facebook: users.facebook,
+        profileImageUrl: users.profileImageUrl,
         role: users.role,
         createdAt: users.createdAt
       })
@@ -55,9 +78,28 @@ export class UsersRepository {
         id: users.id,
         name: users.name,
         email: users.email,
+        phone: users.phone,
+        identity: users.identity,
+        facebook: users.facebook,
+        profileImageUrl: users.profileImageUrl,
         role: users.role,
         createdAt: users.createdAt
       })
       .from(users);
+  }
+
+  async updateRole(id: number, role: UserRole) {
+    const result = await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, id))
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role
+      });
+
+    return result[0] ?? null;
   }
 }

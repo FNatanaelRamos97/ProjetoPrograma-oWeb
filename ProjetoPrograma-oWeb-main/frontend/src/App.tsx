@@ -37,6 +37,7 @@ export default function App() {
         <Route path="/profissionais" element={<Profissionais />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/agenda" element={<Agenda />} />
+        <Route path="/agenda/:serviceId" element={<Agenda />} />
         <Route path="/pix" element={<PIX />} />
         <Route path="/pagamento" element={<Pagamento />} />
         <Route path="/pagamento-realizado" element={<PagamentoRealizado />} />

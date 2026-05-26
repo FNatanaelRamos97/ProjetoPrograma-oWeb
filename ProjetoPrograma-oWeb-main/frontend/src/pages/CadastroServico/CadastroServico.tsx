@@ -1,163 +1,294 @@
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ChevronDown, Image, Check } from 'lucide-react'
-import { createService } from '@db/database'
-import { useAuth } from '../../contexts/AuthContext'
-import NavBar from '../../components/NavBar/NavBar'
-import styles from './CadastroServico.module.css'
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronDown, Image, Check } from "lucide-react";
+import { createService } from "@db/database";
+import { useAuth } from "../../contexts/AuthContext";
+import NavBar from "../../components/NavBar/NavBar";
+import styles from "./CadastroServico.module.css";
 
 const CATEGORIES = [
-  'Consultoria',
-  'Aulas e Cursos',
-  'Design Gráfico',
-  'Desenvolvimento Web',
-  'Programação e TI',
-  'Marketing Digital',
-  'Redes Sociais',
-  'Edição de Vídeo',
-  'Fotografia',
-  'Música e Áudio',
-  'Tradução e Conteúdo',
-  'Assistente Virtual',
-  'Suporte Técnico',
-  'Manutenção e Reparos',
-  'Limpeza e Organização',
-  'Reformas e Construção',
-  'Jardinagem e Paisagismo',
-  'Saúde e Bem-Estar',
-  'Beleza e Estética',
-  'Pet Care',
-  'Eventos e Cerimônias',
-  'Transporte e Mudanças',
-  'Entregas e Frete',
-  'Advocacia e Jurídico',
-  'Finanças e Contabilidade',
-  'Administração',
-  'Outra',
-]
+  "Consultoria",
+  "Aulas e Cursos",
+  "Design Gráfico",
+  "Desenvolvimento Web",
+  "Programação e TI",
+  "Marketing Digital",
+  "Redes Sociais",
+  "Edição de Vídeo",
+  "Fotografia",
+  "Música e Áudio",
+  "Tradução e Conteúdo",
+  "Assistente Virtual",
+  "Suporte Técnico",
+  "Manutenção e Reparos",
+  "Limpeza e Organização",
+  "Reformas e Construção",
+  "Jardinagem e Paisagismo",
+  "Saúde e Bem-Estar",
+  "Beleza e Estética",
+  "Pet Care",
+  "Eventos e Cerimônias",
+  "Transporte e Mudanças",
+  "Entregas e Frete",
+  "Advocacia e Jurídico",
+  "Finanças e Contabilidade",
+  "Administração",
+  "Outra",
+];
 
 const SUBCATEGORIES: Record<string, string[]> = {
-  'Consultoria': [
-    'Financeira', 'RH', 'Marketing', 'TI', 'Empresarial', 'Vendas', 'Estratégica', 'Outra',
+  Consultoria: [
+    "Financeira",
+    "RH",
+    "Marketing",
+    "TI",
+    "Empresarial",
+    "Vendas",
+    "Estratégica",
+    "Outra",
   ],
-  'Aulas e Cursos': [
-    'Particulares', 'Online', 'Presencial', 'Reforço Escolar', 'Idiomas',
-    'Música', 'Dança', 'Esportes', 'Outra',
+  "Aulas e Cursos": [
+    "Particulares",
+    "Online",
+    "Presencial",
+    "Reforço Escolar",
+    "Idiomas",
+    "Música",
+    "Dança",
+    "Esportes",
+    "Outra",
   ],
-  'Design Gráfico': [
-    'Logotipos', 'Identidade Visual', 'Social Media', 'Apresentações',
-    'Mockups', ' banners', 'Flyers', 'Embalagens', 'Outra',
+  "Design Gráfico": [
+    "Logotipos",
+    "Identidade Visual",
+    "Social Media",
+    "Apresentações",
+    "Mockups",
+    " banners",
+    "Flyers",
+    "Embalagens",
+    "Outra",
   ],
-  'Desenvolvimento Web': [
-    'Sites', 'Lojas Virtuais', 'Landing Pages', 'Portfólios',
-    'Aplicações Web', 'Manutenção', 'Hospedagem', 'Outra',
+  "Desenvolvimento Web": [
+    "Sites",
+    "Lojas Virtuais",
+    "Landing Pages",
+    "Portfólios",
+    "Aplicações Web",
+    "Manutenção",
+    "Hospedagem",
+    "Outra",
   ],
-  'Programação e TI': [
-    'Desenvolvimento de Software', 'Suporte Técnico', 'Banco de Dados',
-    'Automação', 'API', 'Segurança', 'Cloud', 'Outra',
+  "Programação e TI": [
+    "Desenvolvimento de Software",
+    "Suporte Técnico",
+    "Banco de Dados",
+    "Automação",
+    "API",
+    "Segurança",
+    "Cloud",
+    "Outra",
   ],
-  'Marketing Digital': [
-    'Gestão de Tráfego', 'SEO', 'Email Marketing', 'Inbound',
-    'Outbound', 'Anúncios', 'Analytics', 'Outra',
+  "Marketing Digital": [
+    "Gestão de Tráfego",
+    "SEO",
+    "Email Marketing",
+    "Inbound",
+    "Outbound",
+    "Anúncios",
+    "Analytics",
+    "Outra",
   ],
-  'Redes Sociais': [
-    'Criação de Conteúdo', 'Gestão de Perfis', 'Campanhas Pagas',
-    'Design para Redes', 'Reels', 'Copy para Redes', 'Outra',
+  "Redes Sociais": [
+    "Criação de Conteúdo",
+    "Gestão de Perfis",
+    "Campanhas Pagas",
+    "Design para Redes",
+    "Reels",
+    "Copy para Redes",
+    "Outra",
   ],
-  'Edição de Vídeo': [
-    'YouTube', 'Redes Sociais', 'Vídeos Institucionais',
-    ' Edição', 'Animação', 'Motion Graphics', 'Outra',
+  "Edição de Vídeo": [
+    "YouTube",
+    "Redes Sociais",
+    "Vídeos Institucionais",
+    " Edição",
+    "Animação",
+    "Motion Graphics",
+    "Outra",
   ],
-  'Fotografia': [
-    'Ensaios', 'Eventos', 'Produto', 'Aérea',
-    'Edição de Fotos', 'Book', 'Outra',
+  Fotografia: [
+    "Ensaios",
+    "Eventos",
+    "Produto",
+    "Aérea",
+    "Edição de Fotos",
+    "Book",
+    "Outra",
   ],
-  'Música e Áudio': [
-    'Produção Musical', 'Mixagem e Masterização', 'Edição de Áudio',
-    'Podcast', 'Trilha Sonora', 'Locução', 'Outra',
+  "Música e Áudio": [
+    "Produção Musical",
+    "Mixagem e Masterização",
+    "Edição de Áudio",
+    "Podcast",
+    "Trilha Sonora",
+    "Locução",
+    "Outra",
   ],
-  'Tradução e Conteúdo': [
-    'Textos', 'Tradução', 'Revisão', 'Copywriting',
-    'Redação Técnica', 'Ghostwriting', 'Outra',
+  "Tradução e Conteúdo": [
+    "Textos",
+    "Tradução",
+    "Revisão",
+    "Copywriting",
+    "Redação Técnica",
+    "Ghostwriting",
+    "Outra",
   ],
-  'Assistente Virtual': [
-    'Administrativo', 'Agendamento', 'Atendimento ao Cliente',
-    'Gestão de E-mails', 'Pesquisas', 'Outra',
+  "Assistente Virtual": [
+    "Administrativo",
+    "Agendamento",
+    "Atendimento ao Cliente",
+    "Gestão de E-mails",
+    "Pesquisas",
+    "Outra",
   ],
-  'Suporte Técnico': [
-    'Hardware', 'Software', 'Redes', 'Configuração',
-    'Manutenção de Computadores', 'Outra',
+  "Suporte Técnico": [
+    "Hardware",
+    "Software",
+    "Redes",
+    "Configuração",
+    "Manutenção de Computadores",
+    "Outra",
   ],
-  'Manutenção e Reparos': [
-    'Elétrica', 'Hidráulica', 'Pintura', 'Montagem',
-    'Ar Condicionado', 'Marcenaria', 'Outra',
+  "Manutenção e Reparos": [
+    "Elétrica",
+    "Hidráulica",
+    "Pintura",
+    "Montagem",
+    "Ar Condicionado",
+    "Marcenaria",
+    "Outra",
   ],
-  'Limpeza e Organização': [
-    'Residencial', 'Comercial', 'Pós-Obra',
-    'Organização', 'Office Cleaning', 'Outra',
+  "Limpeza e Organização": [
+    "Residencial",
+    "Comercial",
+    "Pós-Obra",
+    "Organização",
+    "Office Cleaning",
+    "Outra",
   ],
-  'Reformas e Construção': [
-    'Projetos', 'Execução', 'Revestimentos', 'Drywall',
-    'Pisos', 'Telhado', 'Outra',
+  "Reformas e Construção": [
+    "Projetos",
+    "Execução",
+    "Revestimentos",
+    "Drywall",
+    "Pisos",
+    "Telhado",
+    "Outra",
   ],
-  'Jardinagem e Paisagismo': [
-    'Manutenção', 'Projetos', 'Corte', 'Plantio',
-    'Irrigação', 'Podas', 'Outra',
+  "Jardinagem e Paisagismo": [
+    "Manutenção",
+    "Projetos",
+    "Corte",
+    "Plantio",
+    "Irrigação",
+    "Podas",
+    "Outra",
   ],
-  'Saúde e Bem-Estar': [
-    'Personal Trainer', 'Nutrição', 'Psicologia', 'Fisioterapia',
-    'Terapias', 'Massoterapia', 'Outra',
+  "Saúde e Bem-Estar": [
+    "Personal Trainer",
+    "Nutrição",
+    "Psicologia",
+    "Fisioterapia",
+    "Terapias",
+    "Massoterapia",
+    "Outra",
   ],
-  'Beleza e Estética': [
-    'Cabelo', 'Unhas', 'Maquiagem', 'Depilação',
-    'Massagem', 'Design de Sobrancelhas', 'Outra',
+  "Beleza e Estética": [
+    "Cabelo",
+    "Unhas",
+    "Maquiagem",
+    "Depilação",
+    "Massagem",
+    "Design de Sobrancelhas",
+    "Outra",
   ],
-  'Pet Care': [
-    'Banho e Tosa', 'Passeio', 'Hotel', 'Adestramento',
-    'Veterinário', 'Pet Sitter', 'Outra',
+  "Pet Care": [
+    "Banho e Tosa",
+    "Passeio",
+    "Hotel",
+    "Adestramento",
+    "Veterinário",
+    "Pet Sitter",
+    "Outra",
   ],
-  'Eventos e Cerimônias': [
-    'Buffet', 'Decoração', 'DJ', 'Cerimonial',
-    'Iluminação', 'Fotografia de Eventos', 'Outra',
+  "Eventos e Cerimônias": [
+    "Buffet",
+    "Decoração",
+    "DJ",
+    "Cerimonial",
+    "Iluminação",
+    "Fotografia de Eventos",
+    "Outra",
   ],
-  'Transporte e Mudanças': [
-    'Mudanças', 'Transporte de Veículos', 'Entregas Grandes',
-    'Fretes', 'Outra',
+  "Transporte e Mudanças": [
+    "Mudanças",
+    "Transporte de Veículos",
+    "Entregas Grandes",
+    "Fretes",
+    "Outra",
   ],
-  'Entregas e Frete': [
-    'Delivery', 'Encomendas', 'Express', 'Logística',
-    'Roteirização', 'Outra',
+  "Entregas e Frete": [
+    "Delivery",
+    "Encomendas",
+    "Express",
+    "Logística",
+    "Roteirização",
+    "Outra",
   ],
-  'Advocacia e Jurídico': [
-    'Trabalhista', 'Civil', 'Criminal', 'Empresarial',
-    'Contratos', 'Digital', 'Outra',
+  "Advocacia e Jurídico": [
+    "Trabalhista",
+    "Civil",
+    "Criminal",
+    "Empresarial",
+    "Contratos",
+    "Digital",
+    "Outra",
   ],
-  'Finanças e Contabilidade': [
-    'Contabilidade', 'Declaração de Imposto', 'Planejamento Financeiro',
-    'Empréstimos', 'Consultoria Financeira', 'Outra',
+  "Finanças e Contabilidade": [
+    "Contabilidade",
+    "Declaração de Imposto",
+    "Planejamento Financeiro",
+    "Empréstimos",
+    "Consultoria Financeira",
+    "Outra",
   ],
-  'Administração': [
-    'Tarefas', 'BP', 'Contas a Pagar/Receber',
-    'Secretaria Executiva', 'Burocracia', 'Outra',
+  Administração: [
+    "Tarefas",
+    "BP",
+    "Contas a Pagar/Receber",
+    "Secretaria Executiva",
+    "Burocracia",
+    "Outra",
   ],
-  'Outra': ['Geral'],
-}
+  Outra: ["Geral"],
+};
 
 export default function CadastroServico() {
-  const navigate = useNavigate()
-  const { user, isPrestador, isAdmin } = useAuth()
+  const navigate = useNavigate();
+  const { user, isPrestador, isAdmin, token } = useAuth();
 
-  const [name, setName] = useState('')
-  const [category, setCategory] = useState('')
-  const [subcategory, setSubcategory] = useState('')
-  const [price, setPrice] = useState('')
-  const [estimatedTime, setEstimatedTime] = useState('')
-  const [localizacao, setLocalizacao] = useState('')
-  const [description, setDescription] = useState('')
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [error, setError] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+  const [price, setPrice] = useState("");
+  const [estimatedTime, setEstimatedTime] = useState("");
+  const [localizacao, setLocalizacao] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user || (!isPrestador && !isAdmin)) {
     return (
@@ -165,58 +296,87 @@ export default function CadastroServico() {
         <NavBar />
         <div className={styles.container}>
           <div className={styles.errorBanner}>
-            Apenas prestadores de serviço e administradores podem cadastrar serviços.
+            Apenas prestadores de serviço e administradores podem cadastrar
+            serviços.
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   const handleCategoryChange = (value: string) => {
-    setCategory(value)
-    setSubcategory('')
-  }
+    setCategory(value);
+    setSubcategory("");
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      setError('A imagem deve ter no máximo 5MB.')
-      return
+      setError("A imagem deve ter no máximo 5MB.");
+      return;
     }
-    setImageFile(file)
-    const reader = new FileReader()
-    reader.onload = () => setImagePreview(reader.result as string)
-    reader.readAsDataURL(file)
-    setError('')
-  }
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+    setError("");
+  };
 
   const handleRemoveImage = () => {
-    setImageFile(null)
-    setImagePreview(null)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
+
+    if (!token) {
+      setError("Faça login novamente.");
+      return;
+    }
+
     if (!name || !price) {
-      setError('Nome e preço são obrigatórios.')
-      return
+      setError("Nome e preço são obrigatórios.");
+      return;
     }
+
     if (!category) {
-      setError('Selecione uma categoria.')
-      return
+      setError("Selecione uma categoria.");
+      return;
     }
-    await createService(name, description, Number(price), category, user.id)
-    navigate('/produtos')
-  }
+
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("category", category);
+    formData.append("subcategory", subcategory);
+    formData.append("estimatedTime", estimatedTime);
+    formData.append("location", localizacao);
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    const service = await createService(formData, token);
+
+    if (!service) {
+      setError("Não foi possível cadastrar o serviço.");
+      return;
+    }
+
+    navigate("/produtos");
+  };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  }
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   return (
     <div className={styles.page}>
@@ -242,7 +402,7 @@ export default function CadastroServico() {
               <input
                 className={styles.input}
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Consultoria Financeira"
               />
             </div>
@@ -253,11 +413,13 @@ export default function CadastroServico() {
                 <select
                   className={styles.select}
                   value={category}
-                  onChange={e => handleCategoryChange(e.target.value)}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
                 >
                   <option value="">Selecione</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
                   ))}
                 </select>
                 <ChevronDown className={styles.selectArrow} size={18} />
@@ -271,11 +433,13 @@ export default function CadastroServico() {
                   <select
                     className={styles.select}
                     value={subcategory}
-                    onChange={e => setSubcategory(e.target.value)}
+                    onChange={(e) => setSubcategory(e.target.value)}
                   >
                     <option value="">Selecione</option>
-                    {(SUBCATEGORIES[category] || []).map(sub => (
-                      <option key={sub} value={sub}>{sub}</option>
+                    {(SUBCATEGORIES[category] || []).map((sub) => (
+                      <option key={sub} value={sub}>
+                        {sub}
+                      </option>
                     ))}
                   </select>
                   <ChevronDown className={styles.selectArrow} size={18} />
@@ -293,7 +457,7 @@ export default function CadastroServico() {
                 step="0.01"
                 min="0"
                 value={price}
-                onChange={e => setPrice(e.target.value)}
+                onChange={(e) => setPrice(e.target.value)}
                 placeholder="89,90"
               />
             </div>
@@ -303,7 +467,7 @@ export default function CadastroServico() {
               <input
                 className={styles.input}
                 value={estimatedTime}
-                onChange={e => setEstimatedTime(e.target.value)}
+                onChange={(e) => setEstimatedTime(e.target.value)}
                 placeholder="Ex: 2 horas, 1 semana"
               />
             </div>
@@ -313,13 +477,15 @@ export default function CadastroServico() {
               <input
                 className={styles.input}
                 value={localizacao}
-                onChange={e => setLocalizacao(e.target.value)}
+                onChange={(e) => setLocalizacao(e.target.value)}
                 placeholder="Ex: São Paulo, SP"
               />
             </div>
 
             <div className={`${styles.field} ${styles.fieldFull}`}>
-              <label className={styles.label}>Imagem do serviço (opcional)</label>
+              <label className={styles.label}>
+                Imagem do serviço (opcional)
+              </label>
               {imagePreview ? (
                 <div className={styles.uploadPreview}>
                   <img
@@ -328,9 +494,11 @@ export default function CadastroServico() {
                     alt="Preview"
                   />
                   <div className={styles.uploadInfo}>
-                    <div className={styles.uploadFileName}>{imageFile?.name}</div>
+                    <div className={styles.uploadFileName}>
+                      {imageFile?.name}
+                    </div>
                     <div className={styles.uploadFileSize}>
-                      {imageFile ? formatFileSize(imageFile.size) : ''}
+                      {imageFile ? formatFileSize(imageFile.size) : ""}
                     </div>
                   </div>
                   <button
@@ -367,7 +535,7 @@ export default function CadastroServico() {
               <textarea
                 className={styles.textarea}
                 value={description}
-                onChange={e => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descreva seu serviço com detalhes: o que está incluso, como funciona, quais são os diferenciais..."
               />
             </div>
@@ -399,7 +567,7 @@ export default function CadastroServico() {
             <button
               type="button"
               className={styles.btnSecondary}
-              onClick={() => navigate('/produtos')}
+              onClick={() => navigate("/produtos")}
             >
               Cancelar
             </button>
@@ -410,5 +578,5 @@ export default function CadastroServico() {
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,9 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../components/NavBar/NavBar'
+import { createAppointment, getProviderAvailability, getServiceById } from '../../../../database/database.ts'
+import { useAuth } from '../../contexts/AuthContext'
+import type { AvailabilityDay } from '../../types'
 import styles from './Agenda.module.css'
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -10,7 +13,7 @@ const MONTHS = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ]
 
-const YEARS = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030]
+const YEARS = [2026, 2027, 2028, 2029, 2030]
 
 function getCalendarGrid(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay()
@@ -30,6 +33,7 @@ function getCalendarGrid(year: number, month: number) {
   const totalCells = Math.ceil((prevMonth.length + currentMonth.length) / 7) * 7
   const nextMonth = []
   const remaining = totalCells - prevMonth.length - currentMonth.length
+
   for (let i = 1; i <= remaining; i++) {
     nextMonth.push({ day: i, type: 'next' as const })
   }
@@ -39,44 +43,149 @@ function getCalendarGrid(year: number, month: number) {
 
 export default function Agenda() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const params = useParams()
+  const { token } = useAuth()
+
   const today = new Date()
+
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [openMonth, setOpenMonth] = useState(false)
   const [openYear, setOpenYear] = useState(false)
+  const [availability, setAvailability] = useState<AvailabilityDay[]>([])
+  const [providerId, setProviderId] = useState<number | null>(location.state?.providerId ?? null)
+  const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? '')
+  const [providerName, setProviderName] = useState<string>(location.state?.providerName ?? '')
+  const [error, setError] = useState('')
+
+  const serviceId = Number(params.serviceId || location.state?.serviceId)
+
+  useEffect(() => {
+    async function loadService() {
+      if (!serviceId) return
+
+      const service = await getServiceById(serviceId)
+
+      if (service) {
+        setProviderId(service.provider_id)
+        setServiceName(service.name)
+        setProviderName(service.provider_name)
+      }
+    }
+
+    loadService()
+  }, [serviceId])
+
+  useEffect(() => {
+    async function loadAvailability() {
+      if (!providerId) return
+
+      const data = await getProviderAvailability(providerId, year, month + 1)
+      setAvailability(data)
+    }
+
+    loadAvailability()
+  }, [providerId, year, month])
 
   const grid = getCalendarGrid(year, month)
 
   const prevMonth = () => {
-    if (month === 0) { setYear(y => y - 1); setMonth(11) }
-    else setMonth(m => m - 1)
-    setSelected(null)
+    if (month === 0) {
+      setYear(y => y - 1)
+      setMonth(11)
+    } else {
+      setMonth(m => m - 1)
+    }
+
+    setSelectedDate(null)
   }
 
   const nextMonth = () => {
-    if (month === 11) { setYear(y => y + 1); setMonth(0) }
-    else setMonth(m => m + 1)
-    setSelected(null)
+    if (month === 11) {
+      setYear(y => y + 1)
+      setMonth(0)
+    } else {
+      setMonth(m => m + 1)
+    }
+
+    setSelectedDate(null)
   }
 
   const selectMonth = (m: number) => {
     setMonth(m)
     setOpenMonth(false)
-    setSelected(null)
+    setSelectedDate(null)
   }
 
   const selectYear = (y: number) => {
     setYear(y)
     setOpenYear(false)
-    setSelected(null)
+    setSelectedDate(null)
+  }
+
+  const getDateString = (day: number) => {
+    return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  }
+
+  const isAvailable = (day: number) => {
+    const date = getDateString(day)
+    return availability.find(item => item.date === date)?.available ?? false
+  }
+
+  const handleConfirm = async () => {
+    setError('')
+
+    if (!token) {
+      setError('Faça login para agendar.')
+      return
+    }
+
+    if (!selectedDate || !providerId || !serviceId) {
+      setError('Selecione uma data disponível.')
+      return
+    }
+
+    const appointment = await createAppointment(
+      {
+        serviceId,
+        providerId,
+        appointmentDate: selectedDate
+      },
+      token
+    )
+
+    if (!appointment) {
+      setError('Essa data não está mais disponível.')
+      return
+    }
+
+    navigate('/pagamento', {
+      state: {
+        serviceId,
+        providerId,
+        providerName,
+        serviceName,
+        appointmentDate: selectedDate,
+        appointmentId: appointment.id
+      }
+    })
   }
 
   return (
     <div className={styles.page}>
       <NavBar />
+
       <div className={styles.wrapper}>
         <div className={styles.card}>
+          <div className={styles.serviceInfo}>
+            <h1>Agenda do prestador</h1>
+            <p>{serviceName} — {providerName}</p>
+          </div>
+
+          {error && <div className={styles.errorAlert}>{error}</div>}
+
           <div className={styles.header}>
             <button className={styles.navBtn} onClick={prevMonth}>&lt;</button>
             <span className={styles.headerTitle}>{MONTHS[month]} {year}</span>
@@ -88,6 +197,7 @@ export default function Agenda() {
               <button className={styles.dropdownToggle} onClick={() => { setOpenMonth(!openMonth); setOpenYear(false) }}>
                 {MONTHS[month]} <span className={styles.arrow}>&#9662;</span>
               </button>
+
               {openMonth && (
                 <div className={styles.dropdownMenu}>
                   {MONTHS.map((m, i) => (
@@ -107,6 +217,7 @@ export default function Agenda() {
               <button className={styles.dropdownToggle} onClick={() => { setOpenYear(!openYear); setOpenMonth(false) }}>
                 {year} <span className={styles.arrow}>&#9662;</span>
               </button>
+
               {openYear && (
                 <div className={styles.yearGrid}>
                   {YEARS.map(y => (
@@ -132,13 +243,31 @@ export default function Agenda() {
           <div className={styles.grid}>
             {grid.map((cell, i) => {
               const isCurrent = cell.type === 'current'
-              const isSelected = isCurrent && selected === cell.day
-              const isToday = isCurrent && cell.day === today.getDate() && month === today.getMonth() && year === today.getFullYear()
+              const available = isCurrent ? isAvailable(cell.day) : false
+              const dateString = isCurrent ? getDateString(cell.day) : ''
+              const isSelected = isCurrent && selectedDate === dateString
+              const isToday =
+                isCurrent &&
+                cell.day === today.getDate() &&
+                month === today.getMonth() &&
+                year === today.getFullYear()
+
               return (
                 <div
                   key={i}
-                  className={`${styles.day} ${cell.type === 'prev' || cell.type === 'next' ? styles.dayFaded : ''} ${isSelected ? styles.daySelected : ''} ${isToday ? styles.dayToday : ''}`}
-                  onClick={() => isCurrent && setSelected(selected === cell.day ? null : cell.day)}
+                  className={`
+                    ${styles.day}
+                    ${cell.type === 'prev' || cell.type === 'next' ? styles.dayFaded : ''}
+                    ${isSelected ? styles.daySelected : ''}
+                    ${isToday ? styles.dayToday : ''}
+                    ${isCurrent && !available ? styles.dayUnavailable : ''}
+                    ${isCurrent && available ? styles.dayAvailable : ''}
+                  `}
+                  onClick={() => {
+                    if (isCurrent && available) {
+                      setSelectedDate(selectedDate === dateString ? null : dateString)
+                    }
+                  }}
                 >
                   {cell.day}
                 </div>
@@ -146,10 +275,15 @@ export default function Agenda() {
             })}
           </div>
 
+          <div className={styles.legend}>
+            <span><b className={styles.legendAvailable}></b> Disponível</span>
+            <span><b className={styles.legendUnavailable}></b> Indisponível</span>
+          </div>
+
           <button
             className={styles.confirmBtn}
-            disabled={selected === null}
-            onClick={() => navigate('/pagamento')}
+            disabled={selectedDate === null}
+            onClick={handleConfirm}
           >
             Confirmar Agendamento
           </button>

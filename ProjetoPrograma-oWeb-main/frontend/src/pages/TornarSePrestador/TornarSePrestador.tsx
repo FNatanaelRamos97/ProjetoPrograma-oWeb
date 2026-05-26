@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, ShieldCheck, FileText, Check } from 'lucide-react'
+import { requestProviderRole } from '@db/database.ts'
 import { useAuth } from '../../contexts/AuthContext'
 import NavBar from '../../components/NavBar/NavBar'
 import styles from './TornarSePrestador.module.css'
@@ -28,7 +29,10 @@ const STEPS = [
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <span className={`${styles.toggle} ${checked ? styles.toggleOn : ''}`} onClick={() => onChange(!checked)}>
+    <span
+      className={`${styles.toggle} ${checked ? styles.toggleOn : ''}`}
+      onClick={() => onChange(!checked)}
+    >
       <span className={styles.toggleKnob} />
     </span>
   )
@@ -36,11 +40,12 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export default function TornarSePrestador() {
   const navigate = useNavigate()
-  const { user, login } = useAuth()
+  const { user, token, login } = useAuth()
 
   const [activeStep, setActiveStep] = useState(1)
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Step 1
   const [category, setCategory] = useState('')
@@ -64,14 +69,17 @@ export default function TornarSePrestador() {
 
   const handlePdfSelect = (file: File | null) => {
     if (!file) return
+
     if (file.type !== 'application/pdf') {
       setError('Apenas arquivos PDF são aceitos.')
       return
     }
+
     if (file.size > 5 * 1024 * 1024) {
       setError('O arquivo deve ter no máximo 5MB.')
       return
     }
+
     setPdfFile(file)
     setError('')
   }
@@ -95,18 +103,43 @@ export default function TornarSePrestador() {
 
   const validateStep = (step: number): boolean => {
     setError('')
+
     if (step === 1) {
-      if (!category) { setError('Selecione uma categoria.'); return false }
-      if (!city) { setError('Informe sua cidade.'); return false }
-      if (!experience) { setError('Selecione há quanto tempo atua.'); return false }
+      if (!category) {
+        setError('Selecione uma categoria.')
+        return false
+      }
+
+      if (!city) {
+        setError('Informe sua cidade.')
+        return false
+      }
+
+      if (!experience) {
+        setError('Selecione há quanto tempo atua.')
+        return false
+      }
     }
+
     if (step === 2) {
-      if (!experienceText.trim()) { setError('Conte um pouco sobre sua experiência.'); return false }
-      if (!motivation.trim()) { setError('Conte por que deseja se tornar prestador.'); return false }
+      if (!experienceText.trim()) {
+        setError('Conte um pouco sobre sua experiência.')
+        return false
+      }
+
+      if (!motivation.trim()) {
+        setError('Conte por que deseja se tornar prestador.')
+        return false
+      }
     }
+
     if (step === 4) {
-      if (!termsAccepted) { setError('Aceite os termos para continuar.'); return false }
+      if (!termsAccepted) {
+        setError('Aceite os termos para continuar.')
+        return false
+      }
     }
+
     return true
   }
 
@@ -120,16 +153,61 @@ export default function TornarSePrestador() {
       navigate('/hub')
       return
     }
+
     setActiveStep(prev => prev - 1)
   }
 
-  const handleSubmit = () => {
-    if (!validateStep(4)) return
-    if (!user) return
+  const buildRequestMessage = () => {
+    return [
+      `Categoria: ${category}`,
+      `Cidade/Estado: ${city}`,
+      `Tempo de atuação: ${experience}`,
+      `Experiência profissional: ${experienceText}`,
+      `Diferenciais: ${differentials || 'Não informado'}`,
+      `Motivação: ${motivation}`,
+      `Já trabalhou para clientes relevantes?: ${relevantClients || 'Não informado'}`,
+      `Certificações ou cursos: ${certifications || 'Não informado'}`,
+      `Currículo/portfólio em PDF: ${pdfFile ? pdfFile.name : 'Não enviado'}`
+    ].join('\n')
+  }
 
-    const updatedUser = { ...user, role: 'prestador_pendente' as const }
-    login(updatedUser)
-    setSubmitted(true)
+  const handleSubmit = async () => {
+    if (!validateStep(4)) return
+
+    if (!user) {
+      setError('Faça login para enviar a solicitação.')
+      return
+    }
+
+    if (!token) {
+      setError('Sessão expirada. Faça login novamente.')
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      setError('')
+
+      const message = buildRequestMessage()
+      const ok = await requestProviderRole(message, token)
+
+      if (!ok) {
+        setError('Não foi possível enviar a solicitação. Tente novamente.')
+        return
+      }
+
+      const updatedUser = {
+        ...user,
+        role: 'prestador_pendente' as const
+      }
+
+      login(updatedUser, token)
+      setSubmitted(true)
+    } catch {
+      setError('Erro ao enviar a solicitação. Tente novamente.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!user) {
@@ -154,7 +232,7 @@ export default function TornarSePrestador() {
         <div className={styles.container}>
           <div className={styles.formCard}>
             <p style={{ textAlign: 'center', color: '#6B7280', padding: '40px 0' }}>
-              Você já é um prestador na plataforma.
+              Você já possui acesso de prestador na plataforma.
             </p>
           </div>
         </div>
@@ -170,13 +248,18 @@ export default function TornarSePrestador() {
           <div className={styles.formCard}>
             <div className={styles.successOverlay}>
               <div className={styles.successIcon}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28"><polyline points="20 6 9 17 4 12" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               </div>
+
               <h2 className={styles.successTitle}>Solicitação já enviada</h2>
+
               <p className={styles.successSub}>
                 Sua solicitação para se tornar prestador já foi recebida.<br />
-                Nossa equipe analisará suas informações em breve.
+                Nossa equipe fará a análise em breve.
               </p>
+
               <button className={styles.btnPrimary} onClick={() => navigate('/perfil')}>
                 Voltar para o perfil
               </button>
@@ -195,13 +278,18 @@ export default function TornarSePrestador() {
           <div className={styles.formCard}>
             <div className={styles.successOverlay}>
               <div className={styles.successIcon}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28"><polyline points="20 6 9 17 4 12" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
               </div>
+
               <h2 className={styles.successTitle}>Solicitação enviada com sucesso!</h2>
+
               <p className={styles.successSub}>
-                Nossa equipe analisará suas informações<br />
-                e entraremos em contato em breve.
+                Sua solicitação foi enviada para análise.<br />
+                Aguarde a aprovação do administrador.
               </p>
+
               <button className={styles.btnPrimary} onClick={() => navigate('/perfil')}>
                 Voltar para o perfil
               </button>
@@ -218,17 +306,20 @@ export default function TornarSePrestador() {
         const isActive = activeStep === s.num
         const isComplete = activeStep > s.num
         const isFuture = activeStep < s.num
+
         return (
           <div className={styles.stepWrapper} key={s.num}>
             <div className={`${styles.step} ${isActive ? styles.stepActive : ''} ${isComplete ? styles.stepComplete : ''} ${isFuture ? styles.stepFuture : ''}`}>
               <span className={styles.stepCircle}>
                 {isComplete ? <Check size={16} /> : s.num}
               </span>
+
               <div className={styles.stepTexts}>
                 <span className={styles.stepLabel}>{s.label}</span>
                 <span className={styles.stepSub}>{s.sub}</span>
               </div>
             </div>
+
             {idx < STEPS.length - 1 && (
               <div className={`${styles.stepLine} ${isComplete ? styles.stepLineComplete : isActive ? styles.stepLineActive : ''}`} />
             )}
@@ -241,26 +332,44 @@ export default function TornarSePrestador() {
   const renderStep1 = () => (
     <div className={styles.formGrid}>
       <div className={styles.field}>
-        <label className={styles.label}>Qual serviço deseja oferecer?<span className={styles.required}>*</span></label>
+        <label className={styles.label}>
+          Qual serviço deseja oferecer?<span className={styles.required}>*</span>
+        </label>
+
         <div className={styles.selectWrapper}>
           <select className={styles.select} value={category} onChange={e => setCategory(e.target.value)}>
             <option value="">Selecione</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
+
           <ChevronDown className={styles.selectArrow} size={18} />
         </div>
       </div>
+
       <div className={styles.field}>
-        <label className={styles.label}>Cidade/Estado<span className={styles.required}>*</span></label>
-        <input className={styles.input} value={city} onChange={e => setCity(e.target.value)} placeholder="Ex: São Paulo, SP" />
+        <label className={styles.label}>
+          Cidade/Estado<span className={styles.required}>*</span>
+        </label>
+
+        <input
+          className={styles.input}
+          value={city}
+          onChange={e => setCity(e.target.value)}
+          placeholder="Ex: São Paulo, SP"
+        />
       </div>
+
       <div className={styles.field}>
-        <label className={styles.label}>Há quanto tempo atua na área?<span className={styles.required}>*</span></label>
+        <label className={styles.label}>
+          Há quanto tempo atua na área?<span className={styles.required}>*</span>
+        </label>
+
         <div className={styles.selectWrapper}>
           <select className={styles.select} value={experience} onChange={e => setExperience(e.target.value)}>
             <option value="">Selecione</option>
             {EXPERIENCE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
           </select>
+
           <ChevronDown className={styles.selectArrow} size={18} />
         </div>
       </div>
@@ -270,30 +379,67 @@ export default function TornarSePrestador() {
   const renderStep2 = () => (
     <div className={styles.formGrid}>
       <div className={`${styles.field} ${styles.fieldFull}`}>
-        <label className={styles.label}>Conte um pouco sobre sua experiência profissional<span className={styles.required}>*</span></label>
-        <textarea className={styles.textarea} value={experienceText} onChange={e => setExperienceText(e.target.value)} placeholder="Descreva sua trajetória profissional, áreas em que trabalhou e principais atividades..." rows={4} />
+        <label className={styles.label}>
+          Conte um pouco sobre sua experiência profissional<span className={styles.required}>*</span>
+        </label>
+
+        <textarea
+          className={styles.textarea}
+          value={experienceText}
+          onChange={e => setExperienceText(e.target.value)}
+          placeholder="Descreva sua trajetória profissional, áreas em que trabalhou e principais atividades..."
+          rows={4}
+        />
       </div>
+
       <div className={`${styles.field} ${styles.fieldFull}`}>
         <label className={styles.label}>Quais são seus diferenciais?</label>
-        <textarea className={styles.textarea} value={differentials} onChange={e => setDifferentials(e.target.value)} placeholder="O que faz você se destacar dos demais profissionais?" rows={3} />
+
+        <textarea
+          className={styles.textarea}
+          value={differentials}
+          onChange={e => setDifferentials(e.target.value)}
+          placeholder="O que faz você se destacar dos demais profissionais?"
+          rows={3}
+        />
       </div>
+
       <div className={`${styles.field} ${styles.fieldFull}`}>
-        <label className={styles.label}>Por que você deseja se tornar um prestador ConectServ?<span className={styles.required}>*</span></label>
-        <textarea className={styles.textarea} value={motivation} onChange={e => setMotivation(e.target.value)} placeholder="Conte o que te motivou a se cadastrar na plataforma..." rows={3} />
+        <label className={styles.label}>
+          Por que você deseja se tornar um prestador ConectServ?<span className={styles.required}>*</span>
+        </label>
+
+        <textarea
+          className={styles.textarea}
+          value={motivation}
+          onChange={e => setMotivation(e.target.value)}
+          placeholder="Conte o que motivou seu cadastro na plataforma..."
+          rows={3}
+        />
       </div>
+
       <div className={styles.field}>
         <label className={styles.label}>Já trabalhou para clientes relevantes?</label>
+
         <div className={styles.selectWrapper}>
           <select className={styles.select} value={relevantClients} onChange={e => setRelevantClients(e.target.value)}>
             <option value="">Selecione</option>
             {YES_NO.map(o => <option key={o} value={o}>{o}</option>)}
           </select>
+
           <ChevronDown className={styles.selectArrow} size={18} />
         </div>
       </div>
+
       <div className={styles.field}>
         <label className={styles.label}>Possui certificações ou cursos?</label>
-        <input className={styles.input} value={certifications} onChange={e => setCertifications(e.target.value)} placeholder="Ex: Curso de Design, Certificação Google" />
+
+        <input
+          className={styles.input}
+          value={certifications}
+          onChange={e => setCertifications(e.target.value)}
+          placeholder="Ex: Curso de Design, Certificação Google"
+        />
       </div>
     </div>
   )
@@ -302,20 +448,28 @@ export default function TornarSePrestador() {
     <div className={styles.formGrid}>
       <div className={`${styles.field} ${styles.fieldFull}`}>
         <label className={styles.label}>Adicione seu currículo ou portfólio</label>
+
         {pdfFile ? (
           <div className={styles.uploadPreview}>
             <FileText className={styles.uploadPdfPreviewIcon} />
+
             <div className={styles.uploadInfo}>
               <div className={styles.uploadFileName}>{pdfFile.name}</div>
               <div className={styles.uploadFileSize}>{formatFileSize(pdfFile.size)}</div>
             </div>
-            <button type="button" className={styles.removeBtn} onClick={handleRemovePdf}>Remover</button>
+
+            <button type="button" className={styles.removeBtn} onClick={handleRemovePdf}>
+              Remover
+            </button>
           </div>
         ) : (
           <div
             className={`${styles.uploadArea} ${dragOver ? styles.uploadDragOver : ''}`}
             onClick={() => fileInputRef.current?.click()}
-            onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+            onDragOver={e => {
+              e.preventDefault()
+              setDragOver(true)
+            }}
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
           >
@@ -324,7 +478,14 @@ export default function TornarSePrestador() {
             <span className={styles.uploadHint}>Arraste o arquivo ou clique para selecionar • PDF até 5MB</span>
           </div>
         )}
-        <input ref={fileInputRef} type="file" accept=".pdf,application/pdf" className={styles.uploadHidden} onChange={e => handlePdfSelect(e.target.files?.[0] ?? null)} />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          className={styles.uploadHidden}
+          onChange={e => handlePdfSelect(e.target.files?.[0] ?? null)}
+        />
       </div>
     </div>
   )
@@ -336,40 +497,48 @@ export default function TornarSePrestador() {
           <div className={styles.reviewLabel}>Categoria</div>
           <div className={styles.reviewValue}>{category || '—'}</div>
         </div>
+
         <div className={styles.reviewCard}>
           <div className={styles.reviewLabel}>Cidade</div>
           <div className={styles.reviewValue}>{city || '—'}</div>
         </div>
+
         <div className={styles.reviewCard}>
           <div className={styles.reviewLabel}>Tempo de atuação</div>
           <div className={styles.reviewValue}>{experience || '—'}</div>
         </div>
+
         <div className={`${styles.reviewCard} ${styles.reviewCardFull}`}>
           <div className={styles.reviewLabel}>Experiência</div>
           <div className={styles.reviewValue}>{experienceText || '—'}</div>
         </div>
+
         {differentials && (
           <div className={`${styles.reviewCard} ${styles.reviewCardFull}`}>
             <div className={styles.reviewLabel}>Diferenciais</div>
             <div className={styles.reviewValue}>{differentials}</div>
           </div>
         )}
+
         <div className={`${styles.reviewCard} ${styles.reviewCardFull}`}>
           <div className={styles.reviewLabel}>Motivação</div>
           <div className={styles.reviewValue}>{motivation || '—'}</div>
         </div>
+
         {relevantClients && (
           <div className={styles.reviewCard}>
             <div className={styles.reviewLabel}>Clientes relevantes</div>
             <div className={styles.reviewValue}>{relevantClients}</div>
           </div>
         )}
+
         {certifications && (
           <div className={styles.reviewCard}>
             <div className={styles.reviewLabel}>Certificações</div>
             <div className={styles.reviewValue}>{certifications}</div>
           </div>
         )}
+
         <div className={styles.reviewCard}>
           <div className={styles.reviewLabel}>Currículo</div>
           <div className={styles.reviewValue}>{pdfFile ? pdfFile.name : 'Não enviado'}</div>
@@ -388,12 +557,14 @@ export default function TornarSePrestador() {
   return (
     <div className={styles.page}>
       <NavBar />
+
       <div className={styles.container}>
         <div className={styles.formCard}>
           <span className={styles.formBadge}>🔺 Tornar-se Prestador</span>
 
           <div className={styles.header}>
             <h1 className={styles.title}>Seja um Prestador ConectServ</h1>
+
             <p className={styles.subtitle}>
               Preencha as informações abaixo para solicitar seu cadastro como prestador de serviços na plataforma.
             </p>
@@ -419,13 +590,19 @@ export default function TornarSePrestador() {
             <button type="button" className={styles.btnSecondary} onClick={handleBack}>
               {activeStep === 1 ? 'Cancelar' : 'Voltar'}
             </button>
+
             {activeStep < 4 ? (
               <button type="button" className={styles.btnPrimary} onClick={handleNext}>
                 Continuar
               </button>
             ) : (
-              <button type="button" className={styles.btnPrimary} onClick={handleSubmit}>
-                Enviar solicitação
+              <button
+                type="button"
+                className={styles.btnPrimary}
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar solicitação'}
               </button>
             )}
           </div>

@@ -3,11 +3,26 @@ import { db } from "../db";
 import { services, users } from "../db/schema";
 import type { CreateServiceDTO, UpdateServiceDTO } from "../dtos/services.dto";
 
+type CreateServiceRepositoryDTO = CreateServiceDTO & {
+  providerId: number;
+  imageUrl?: string | null;
+};
+
 export class ServicesRepository {
-  async create(data: CreateServiceDTO) {
+  async create(data: CreateServiceRepositoryDTO) {
     const result = await db
       .insert(services)
-      .values(data)
+      .values({
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        subcategory: data.subcategory,
+        estimatedTime: data.estimatedTime,
+        location: data.location,
+        imageUrl: data.imageUrl ?? null,
+        providerId: data.providerId
+      })
       .returning();
 
     return result[0];
@@ -21,6 +36,10 @@ export class ServicesRepository {
         description: services.description,
         price: services.price,
         category: services.category,
+        subcategory: services.subcategory,
+        estimatedTime: services.estimatedTime,
+        location: services.location,
+        imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name
       })
@@ -37,6 +56,10 @@ export class ServicesRepository {
         description: services.description,
         price: services.price,
         category: services.category,
+        subcategory: services.subcategory,
+        estimatedTime: services.estimatedTime,
+        location: services.location,
+        imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name
       })
@@ -53,6 +76,10 @@ export class ServicesRepository {
         description: services.description,
         price: services.price,
         category: services.category,
+        subcategory: services.subcategory,
+        estimatedTime: services.estimatedTime,
+        location: services.location,
+        imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name
       })
@@ -81,17 +108,10 @@ export class ServicesRepository {
 
     const service = existing[0];
 
-    if (!service) {
-      return false;
-    }
+    if (!service) return false;
+    if (service.providerId !== providerId) return false;
 
-    if (service.providerId !== providerId) {
-      return false;
-    }
-
-    await db
-      .delete(services)
-      .where(eq(services.id, id));
+    await db.delete(services).where(eq(services.id, id));
 
     return true;
   }

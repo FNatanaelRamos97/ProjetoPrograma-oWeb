@@ -1,7 +1,9 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { UsersRepository } from "../repositories/users.repository";
 import { loginUserSchema, registerUserSchema } from "../dtos/auth.dto";
+import { saveImageAsWebp } from "../utils/image";
 
 const usersRepository = new UsersRepository();
 
@@ -17,13 +19,23 @@ export class AuthController {
       });
     }
 
+    let profileImageUrl: string | null = null;
+
+    if (request.file) {
+      profileImageUrl = await saveImageAsWebp(request.file.path, "profiles");
+    }
+
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = await usersRepository.create({
       name: data.name,
       email: data.email,
       passwordHash,
-      role: data.role
+      phone: data.phone,
+      identity: data.identity,
+      facebook: data.facebook,
+      profileImageUrl,
+      role: "cliente"
     });
 
     return response.status(201).json(user);
@@ -48,11 +60,29 @@ export class AuthController {
       });
     }
 
+    const token = jwt.sign(
+      {
+        role: user.role
+      },
+      process.env.JWT_SECRET as string,
+      {
+        subject: String(user.id),
+        expiresIn: process.env.JWT_EXPIRES_IN || "1d"
+      }
+    );
+
     return response.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        identity: user.identity,
+        facebook: user.facebook,
+        profileImageUrl: user.profileImageUrl,
+        role: user.role
+      }
     });
   }
 }

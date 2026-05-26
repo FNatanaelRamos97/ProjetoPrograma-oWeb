@@ -26,6 +26,8 @@ Adicione o conteúdo abaixo:
 
 PORT=3333
 DATABASE_URL=./database.sqlite
+JWT_SECRET=conectserv_secret_dev_123
+JWT_EXPIRES_IN=1d
 
 ## 4. Gerar as migrations do banco
 
