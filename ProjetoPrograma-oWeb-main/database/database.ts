@@ -1,41 +1,26 @@
+import type {
+  AdminDashboard,
+  AuthResponse,
+  AvailabilityDay,
+  ProviderRequest,
+  Service,
+  User
+} from "../frontend/src/types/index.ts";
+
 const API_URL = "http://localhost:3333";
 
-export type UserRole = "cliente" | "prestador" | "admin";
+function getAuthHeaders(token?: string | null) {
+  if (!token) return {};
 
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-};
+  return {
+    Authorization: `Bearer ${token}`
+  };
+}
 
-export type Service = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  provider_id: number;
-  provider_name: string;
-};
-
-export async function createUser(
-  name: string,
-  email: string,
-  password: string,
-  role: "cliente" | "prestador",
-) {
-  const response = await fetch("http://localhost:3333/auth/register", {
+export async function createUser(formData: FormData) {
+  const response = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      password,
-      role,
-    }),
+    body: formData
   });
 
   const result = await response.json();
@@ -44,33 +29,30 @@ export async function createUser(
     return {
       data: null,
       error: result.message,
-      errors: result.errors,
+      errors: result.errors
     };
   }
 
   return {
-    data: result,
+    data: result as User,
     error: null,
-    errors: null,
+    errors: null
   };
 }
 
 export async function loginUser(
   email: string,
-  password: string,
-): Promise<User | null> {
-  if (email === "admin@conectserv.com" && password === "admin123") {
-    return { id: 0, name: "Admin", email: "admin@conectserv.com", role: "admin" };
-  }
+  password: string
+): Promise<AuthResponse | null> {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
       email,
-      password,
-    }),
+      password
+    })
   });
 
   if (!response.ok) {
@@ -83,21 +65,17 @@ export async function loginUser(
 export async function listServices(): Promise<Service[]> {
   const response = await fetch(`${API_URL}/services`);
 
-  if (!response.ok) {
-    return [];
-  }
+  if (!response.ok) return [];
 
   return response.json();
 }
 
 export async function listServicesByProvider(
-  providerId: number,
+  providerId: number
 ): Promise<Service[]> {
   const response = await fetch(`${API_URL}/services/provider/${providerId}`);
 
-  if (!response.ok) {
-    return [];
-  }
+  if (!response.ok) return [];
 
   return response.json();
 }
@@ -105,51 +83,170 @@ export async function listServicesByProvider(
 export async function getServiceById(id: number): Promise<Service | null> {
   const response = await fetch(`${API_URL}/services/${id}`);
 
-  if (!response.ok) {
-    return null;
-  }
+  if (!response.ok) return null;
 
   return response.json();
 }
 
 export async function createService(
-  name: string,
-  description: string,
-  price: number,
-  category: string,
-  providerId: number,
+  formData: FormData,
+  token: string
 ): Promise<Service | null> {
   const response = await fetch(`${API_URL}/services`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(token)
     },
-    body: JSON.stringify({
-      name,
-      description,
-      price,
-      category,
-      providerId,
-    }),
+    body: formData
   });
 
-  if (!response.ok) {
-    return null;
-  }
+  if (!response.ok) return null;
 
   return response.json();
 }
 
 export async function deleteService(
   id: number,
-  providerId: number,
+  token: string
 ): Promise<boolean> {
-  const response = await fetch(
-    `${API_URL}/services/${id}?providerId=${providerId}`,
-    {
-      method: "DELETE",
-    },
-  );
+  const response = await fetch(`${API_URL}/services/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
 
   return response.ok;
+}
+
+export async function requestProviderRole(
+  message: string,
+  token: string
+) {
+  const response = await fetch(`${API_URL}/provider-requests`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(token)
+    },
+    body: JSON.stringify({ message })
+  });
+
+  return response.ok;
+}
+
+export async function listProviderRequests(
+  token: string
+): Promise<ProviderRequest[]> {
+  const response = await fetch(`${API_URL}/provider-requests`, {
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  if (!response.ok) return [];
+
+  return response.json();
+}
+
+export async function approveProviderRequest(
+  id: number,
+  token: string
+) {
+  const response = await fetch(`${API_URL}/provider-requests/${id}/approve`, {
+    method: "PATCH",
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  return response.ok;
+}
+
+export async function rejectProviderRequest(
+  id: number,
+  token: string
+) {
+  const response = await fetch(`${API_URL}/provider-requests/${id}/reject`, {
+    method: "PATCH",
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  return response.ok;
+}
+
+export async function getProviderAvailability(
+  providerId: number,
+  year: number,
+  month: number
+): Promise<AvailabilityDay[]> {
+  const response = await fetch(
+    `${API_URL}/appointments/providers/${providerId}/availability?year=${year}&month=${month}`
+  );
+
+  if (!response.ok) return [];
+
+  return response.json();
+}
+
+export async function createAppointment(
+  data: {
+    serviceId: number
+    providerId: number
+    appointmentDate: string
+  },
+  token: string
+) {
+  const response = await fetch(`${API_URL}/appointments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(token)
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) return null;
+
+  return response.json();
+}
+
+export async function getAdminDashboard(
+  token: string
+): Promise<AdminDashboard | null> {
+  const response = await fetch(`${API_URL}/admin/dashboard`, {
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  if (!response.ok) return null;
+
+  return response.json();
+}
+
+export async function listUsers(token: string): Promise<User[]> {
+  const response = await fetch(`${API_URL}/admin/users`, {
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  if (!response.ok) return [];
+
+  return response.json();
+}
+
+export async function listAdminServices(token: string): Promise<Service[]> {
+  const response = await fetch(`${API_URL}/admin/services`, {
+    headers: {
+      ...getAuthHeaders(token)
+    }
+  });
+
+  if (!response.ok) return [];
+
+  return response.json();
 }

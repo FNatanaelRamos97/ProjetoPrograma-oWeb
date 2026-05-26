@@ -186,7 +186,9 @@
 .card {
   position: relative;
   width: 90%;
-  max-width: 432px;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);

@@ -1,50 +1,86 @@
 import bcrypt from "bcryptjs";
 import { db } from "./index";
-import { users, services } from "./schema";
+import { appointments, providerAvailability, services, users } from "./schema";
 
 async function seed() {
   const passwordHash = await bcrypt.hash("123456", 10);
+  const adminPasswordHash = await bcrypt.hash("admin123", 10);
 
   const createdUsers = await db
     .insert(users)
     .values([
       {
+        name: "Admin",
+        email: "admin@conectserv.com",
+        passwordHash: adminPasswordHash,
+        role: "admin"
+      },
+      {
         name: "Maria Cliente",
         email: "maria@teste.com",
         passwordHash,
-        role: "cliente"
+        role: "cliente",
+        phone: "(61) 99999-0000",
+        identity: "1234567",
+        facebook: "facebook.com/maria"
       },
       {
         name: "João Prestador",
         email: "joao@teste.com",
         passwordHash,
-        role: "prestador"
+        role: "prestador",
+        phone: "(61) 98888-0000",
+        identity: "7654321",
+        facebook: "facebook.com/joao"
       }
     ])
     .returning();
 
   const provider = createdUsers.find((user) => user.role === "prestador");
+  const client = createdUsers.find((user) => user.role === "cliente");
 
-  if (!provider) {
-    throw new Error("Prestador de teste não criado.");
+  if (!provider || !client) {
+    throw new Error("Usuário de teste não criado.");
   }
 
-  await db.insert(services).values([
+  const createdServices = await db.insert(services).values([
     {
       name: "Instalação de chuveiro",
       description: "Serviço de instalação de chuveiro residencial.",
       price: 120,
-      category: "Elétrica",
+      category: "Manutenção e Reparos",
+      subcategory: "Elétrica",
+      estimatedTime: "2 horas",
+      location: "Brasília, DF",
       providerId: provider.id
     },
     {
       name: "Limpeza residencial",
       description: "Serviço de limpeza para apartamentos e casas.",
       price: 180,
-      category: "Limpeza",
+      category: "Limpeza e Organização",
+      subcategory: "Residencial",
+      estimatedTime: "4 horas",
+      location: "Brasília, DF",
       providerId: provider.id
     }
+  ]).returning();
+
+  await db.insert(providerAvailability).values([
+    { providerId: provider.id, dayOfWeek: 1, startTime: "08:00", endTime: "18:00" },
+    { providerId: provider.id, dayOfWeek: 2, startTime: "08:00", endTime: "18:00" },
+    { providerId: provider.id, dayOfWeek: 3, startTime: "08:00", endTime: "18:00" },
+    { providerId: provider.id, dayOfWeek: 4, startTime: "08:00", endTime: "18:00" },
+    { providerId: provider.id, dayOfWeek: 5, startTime: "08:00", endTime: "18:00" }
   ]);
+
+  await db.insert(appointments).values({
+    serviceId: createdServices[0].id,
+    providerId: provider.id,
+    clientId: client.id,
+    appointmentDate: "2026-05-26",
+    status: "confirmado"
+  });
 
   console.log("Dados de teste inseridos com sucesso.");
 }
