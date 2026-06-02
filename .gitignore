@@ -5,8 +5,12 @@ test.txt
 *.local
 *.sqlite
 *.sqlite3
+<<<<<<< HEAD
+*.db
+=======
 *.db
 tmp/
 uploads/
 ould/
 *.zip
+>>>>>>> acde693972f90b8dfe9a05eb427db3c6d1943768
