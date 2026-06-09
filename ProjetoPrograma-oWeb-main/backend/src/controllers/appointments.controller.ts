@@ -2,18 +2,20 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import { AppointmentsRepository } from "../repositories/appointments.repository";
 import { WalletRepository } from "../repositories/wallet.repository";
+import { PaymentsRepository } from "../repositories/payments.repository";
 
 const appointmentsRepository = new AppointmentsRepository();
 const walletRepository = new WalletRepository();
+const paymentsRepository = new PaymentsRepository();
 
 const createAppointmentSchema = z.object({
   serviceId: z.number().int().positive(),
   providerId: z.number().int().positive(),
-  appointmentDate: z.string().min(10)
+  appointmentDate: z.string().min(10),
 });
 
 const cancelSchema = z.object({
-  cancellationReason: z.string().min(1, "Motivo do cancelamento é obrigatório")
+  cancellationReason: z.string().min(1, "Motivo do cancelamento é obrigatório"),
 });
 
 export class AppointmentsController {
@@ -24,14 +26,14 @@ export class AppointmentsController {
 
     if (!providerId || !year || !month) {
       return response.status(400).json({
-        message: "providerId, year e month são obrigatórios"
+        message: "providerId, year e month são obrigatórios",
       });
     }
 
     const availability = await appointmentsRepository.findAvailability(
       providerId,
       year,
-      month
+      month,
     );
 
     return response.json(availability);
@@ -46,12 +48,12 @@ export class AppointmentsController {
 
     const appointment = await appointmentsRepository.create({
       ...data,
-      clientId: request.user.id
+      clientId: request.user.id,
     });
 
     if (!appointment) {
       return response.status(409).json({
-        message: "Data indisponível para esse prestador"
+        message: "Data indisponível para esse prestador",
       });
     }
 
@@ -69,17 +71,20 @@ export class AppointmentsController {
     }
 
     const appointments = await appointmentsRepository.findByClientId(
-      request.user.id
+      request.user.id,
     );
     return response.json(appointments);
   }
 
   async confirm(request: Request, response: Response) {
     const id = Number(request.params.id);
-    const appointment = await appointmentsRepository.confirm(id);
+
+    const appointment = await appointmentsRepository.completeByClient(id);
 
     if (!appointment) {
-      return response.status(404).json({ message: "Agendamento não encontrado" });
+      return response.status(404).json({
+        message: "Agendamento não encontrado ou ainda não pago",
+      });
     }
 
     await walletRepository.releasePayment("appointment", id);
@@ -87,18 +92,36 @@ export class AppointmentsController {
     return response.json(appointment);
   }
 
+  async listMyProviderAppointments(request: Request, response: Response) {
+    if (!request.user) {
+      return response.status(401).json({ message: "Usuário não autenticado" });
+    }
+
+    const appointments = await appointmentsRepository.findByProviderId(
+      request.user.id,
+    );
+
+    return response.json(appointments);
+  }
+
   async cancel(request: Request, response: Response) {
+    if (!request.user) {
+      return response.status(401).json({ message: "Usuário não autenticado" });
+    }
+
     const id = Number(request.params.id);
     const data = cancelSchema.parse(request.body);
 
-    const appointment = await appointmentsRepository.cancel(id, data.cancellationReason);
+    const result = await paymentsRepository.cancelPaidAppointment(
+      id,
+      request.user.id,
+      data.cancellationReason,
+    );
 
-    if (!appointment) {
-      return response.status(404).json({ message: "Agendamento não encontrado" });
+    if (!result.ok) {
+      return response.status(400).json({ message: result.message });
     }
 
-    await walletRepository.cancelPayment("appointment", id, data.cancellationReason);
-
-    return response.json(appointment);
+    return response.json({ message: result.message });
   }
 }

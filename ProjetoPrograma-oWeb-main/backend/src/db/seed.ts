@@ -87,14 +87,6 @@ async function seed() {
     { providerId: provider.id, dayOfWeek: 5, startTime: "08:00", endTime: "18:00" }
   ]);
 
-  await db.insert(appointments).values({
-    serviceId: createdServices[0].id,
-    providerId: provider.id,
-    clientId: client.id,
-    appointmentDate: "2026-05-26",
-    status: "confirmado"
-  });
-
   console.log("Dados de teste inseridos com sucesso.");
 }
 

@@ -2,18 +2,45 @@ import NavBar from "../../components/NavBar/NavBar";
 import styles from "./Admin.module.css";
 import { useEffect, useState } from "react";
 import {
-  approveProviderRequest, getAdminDashboard, getAllTransactions,
-  getSalesLogs, getSalesStats, listAdminServices,
-  listProviderRequests, listUsers, rejectProviderRequest
+  approveProviderRequest,
+  getAdminDashboard,
+  getAllTransactions,
+  getSalesLogs,
+  getSalesStats,
+  listAdminServices,
+  listProviderRequests,
+  listUsers,
+  rejectProviderRequest,
+  getAllWithdrawalRequests,
+  approveWithdrawalRequest,
+  rejectWithdrawalRequest,
+  getAdminReviews,
+  type AdminReview,
+  type WithdrawalRequest,
 } from "@db/database";
 import { useAuth } from "../../contexts/AuthContext";
 import type {
-  AdminDashboard, ProviderRequest, SalesLog, SalesStats, Service, Transaction, User
+  AdminDashboard,
+  ProviderRequest,
+  SalesLog,
+  SalesStats,
+  Service,
+  Transaction,
+  User,
 } from "../../types/index";
 import {
-  LayoutDashboard, TrendingUp, Package, ClipboardList, Calendar,
-  Users, UserCheck, BarChart3, Star, MessageSquare, Settings,
-  type LucideIcon
+  LayoutDashboard,
+  TrendingUp,
+  Package,
+  ClipboardList,
+  Calendar,
+  Users,
+  UserCheck,
+  BarChart3,
+  Star,
+  MessageSquare,
+  Settings,
+  type LucideIcon,
 } from "lucide-react";
 import PainelSection from "./sections/PainelSection";
 import VendasSection from "./sections/VendasSection";
@@ -26,8 +53,9 @@ import RelatoriosSection from "./sections/RelatoriosSection";
 import AvaliacoesSection from "./sections/AvaliacoesSection";
 import MensagensSection from "./sections/MensagensSection";
 import ConfiguracoesSection from "./sections/ConfiguracoesSection";
+import RepassesSection from "./sections/RepasseSection";
 
-type SidebarItem = { id: string; label: string; icon: LucideIcon }
+type SidebarItem = { id: string; label: string; icon: LucideIcon };
 
 const sidebarGroups: { group: string; items: SidebarItem[] }[] = [
   {
@@ -36,6 +64,7 @@ const sidebarGroups: { group: string; items: SidebarItem[] }[] = [
       { id: "painel", label: "Painel", icon: LayoutDashboard },
       { id: "vendas", label: "Vendas", icon: TrendingUp },
       { id: "produtos", label: "Produtos", icon: Package },
+      { id: "repasses", label: "Repasses", icon: TrendingUp },
     ],
   },
   {
@@ -59,17 +88,54 @@ const sidebarGroups: { group: string; items: SidebarItem[] }[] = [
 ];
 
 const sectionHeaders: Record<string, { title: string; subtitle: string }> = {
-  painel: { title: "Olá, Admin 👋", subtitle: "Aqui está o resumo geral da sua plataforma." },
-  vendas: { title: "Vendas 💰", subtitle: "Acompanhe todas as transações e receitas da plataforma." },
-  produtos: { title: "Serviços 📦", subtitle: "Gerencie todos os serviços cadastrados na plataforma." },
-  pedidos: { title: "Análise de Prestadores 📋", subtitle: "Avalie e gerencie as solicitações para se tornar prestador." },
-  agendamentos: { title: "Agendamentos 📅", subtitle: "Visualize e gerencie todos os agendamentos da plataforma." },
-  clientes: { title: "Clientes 👥", subtitle: "Gerencie os clientes cadastrados na plataforma." },
-  prestadores: { title: "Prestadores ⚡", subtitle: "Gerencie os prestadores de serviços da plataforma." },
-  relatorios: { title: "Relatórios 📈", subtitle: "Gere relatórios personalizados sobre a plataforma." },
-  avaliacoes: { title: "Avaliações ⭐", subtitle: "Modere e acompanhe as avaliações dos serviços." },
-  mensagens: { title: "Mensagens 💬", subtitle: "Central de mensagens da plataforma." },
-  configuracoes: { title: "Configurações ⚙", subtitle: "Configure os parâmetros da plataforma." },
+  painel: {
+    title: "Olá, Admin 👋",
+    subtitle: "Aqui está o resumo geral da sua plataforma.",
+  },
+  vendas: {
+    title: "Vendas 💰",
+    subtitle: "Acompanhe todas as transações e receitas da plataforma.",
+  },
+  produtos: {
+    title: "Serviços 📦",
+    subtitle: "Gerencie todos os serviços cadastrados na plataforma.",
+  },
+  pedidos: {
+    title: "Análise de Prestadores 📋",
+    subtitle: "Avalie e gerencie as solicitações para se tornar prestador.",
+  },
+  agendamentos: {
+    title: "Agendamentos 📅",
+    subtitle: "Visualize e gerencie todos os agendamentos da plataforma.",
+  },
+  clientes: {
+    title: "Clientes 👥",
+    subtitle: "Gerencie os clientes cadastrados na plataforma.",
+  },
+  prestadores: {
+    title: "Prestadores ⚡",
+    subtitle: "Gerencie os prestadores de serviços da plataforma.",
+  },
+  relatorios: {
+    title: "Relatórios 📈",
+    subtitle: "Gere relatórios personalizados sobre a plataforma.",
+  },
+  avaliacoes: {
+    title: "Avaliações ⭐",
+    subtitle: "Modere e acompanhe as avaliações dos serviços.",
+  },
+  mensagens: {
+    title: "Mensagens 💬",
+    subtitle: "Central de mensagens da plataforma.",
+  },
+  configuracoes: {
+    title: "Configurações ⚙",
+    subtitle: "Configure os parâmetros da plataforma.",
+  },
+  repasses: {
+    title: "Repasses 💸",
+    subtitle: "Analise e aprove as solicitações de repasse dos prestadores.",
+  },
 };
 
 export default function Admin() {
@@ -78,22 +144,44 @@ export default function Admin() {
   const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [providerRequests, setProviderRequests] = useState<ProviderRequest[]>([]);
+  const [providerRequests, setProviderRequests] = useState<ProviderRequest[]>(
+    [],
+  );
   const [salesLogs, setSalesLogs] = useState<SalesLog[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
   const [salesStats, setSalesStats] = useState<SalesStats | null>(null);
+  const [withdrawalRequests, setWithdrawalRequests] = useState<
+    WithdrawalRequest[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       if (!token) return;
       setLoading(true);
-      const [d, u, s, r, sl, tx, ss] = await Promise.all([
-        getAdminDashboard(token), listUsers(token), listAdminServices(token),
-        listProviderRequests(token), getSalesLogs(token), getAllTransactions(token), getSalesStats(token),
+      const [d, u, s, r, sl, tx, ss, wr, rv] = await Promise.all([
+        getAdminDashboard(token),
+        listUsers(token),
+        listAdminServices(token),
+        listProviderRequests(token),
+        getSalesLogs(token),
+        getAllTransactions(token),
+        getSalesStats(token),
+        getAllWithdrawalRequests(token),
+        getAdminReviews(token),
       ]);
-      setDashboard(d); setUsers(u); setServices(s); setProviderRequests(r);
-      setSalesLogs(sl); setTransactions(tx); setSalesStats(ss); setLoading(false);
+
+      setWithdrawalRequests(wr);
+      setDashboard(d);
+      setUsers(u);
+      setServices(s);
+      setProviderRequests(r);
+      setSalesLogs(sl);
+      setTransactions(tx);
+      setSalesStats(ss);
+      setLoading(false);
+      setReviews(rv);
     }
     loadData();
   }, [token]);
@@ -101,102 +189,104 @@ export default function Admin() {
   const handleApprove = async (id: number) => {
     if (!token) return;
     const ok = await approveProviderRequest(id, token);
-    if (ok) setProviderRequests(prev => prev.map(r => r.id === id ? { ...r, status: "aprovado" as const } : r));
+    if (ok)
+      setProviderRequests((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, status: "aprovado" as const } : r,
+        ),
+      );
   };
 
   const handleReject = async (id: number) => {
     if (!token) return;
     const ok = await rejectProviderRequest(id, token);
-    if (ok) setProviderRequests(prev => prev.map(r => r.id === id ? { ...r, status: "recusado" as const } : r));
+    if (ok)
+      setProviderRequests((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, status: "recusado" as const } : r,
+        ),
+      );
+  };
+
+  const handleApproveWithdrawal = async (id: number) => {
+    if (!token) return;
+
+    const ok = await approveWithdrawalRequest(id, token);
+
+    if (ok) {
+      setWithdrawalRequests((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: "pago" as const } : item,
+        ),
+      );
+    }
+  };
+
+  const handleRejectWithdrawal = async (id: number) => {
+    if (!token) return;
+
+    const ok = await rejectWithdrawalRequest(id, token);
+
+    if (ok) {
+      setWithdrawalRequests((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: "recusado" as const } : item,
+        ),
+      );
+    }
   };
 
   const header = sectionHeaders[activeSidebar];
 
   function renderSection() {
     switch (activeSidebar) {
-      case "painel": return <PainelSection dashboard={dashboard} salesLogs={salesLogs} services={services} salesStats={salesStats} />;
-      case "vendas": return <VendasSection salesLogs={salesLogs} />;
-      case "produtos": return <ProdutosSection services={services} />;
-      case "pedidos": return <PedidosSection providerRequests={providerRequests} onApprove={handleApprove} onReject={handleReject} />;
-      case "agendamentos": return <AgendamentosSection dashboard={dashboard} />;
-      case "clientes": return <ClientesSection users={users} />;
-      case "prestadores": return <PrestadoresSection users={users} services={services} />;
-      case "relatorios": return <RelatoriosSection />;
-      case "avaliacoes": return <AvaliacoesSection />;
-      case "mensagens": return <MensagensSection />;
-      case "configuracoes": return <ConfiguracoesSection />;
-      default: return null;
+      case "painel":
+        return (
+          <PainelSection
+            dashboard={dashboard}
+            salesLogs={salesLogs}
+            services={services}
+            salesStats={salesStats}
+          />
+        );
+      case "vendas":
+        return <VendasSection salesLogs={salesLogs} />;
+      case "produtos":
+        return <ProdutosSection services={services} />;
+      case "pedidos":
+        return (
+          <PedidosSection
+            providerRequests={providerRequests}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        );
+      case "agendamentos":
+        return <AgendamentosSection dashboard={dashboard} />;
+      case "clientes":
+        return <ClientesSection users={users} />;
+      case "prestadores":
+        return <PrestadoresSection users={users} services={services} />;
+      case "relatorios":
+        return <RelatoriosSection />;
+      case "avaliacoes":
+        return <AvaliacoesSection reviews={reviews}/>;
+      case "mensagens":
+        return <MensagensSection />;
+      case "configuracoes":
+        return <ConfiguracoesSection />;
+      case "repasses":
+        return (
+          <RepassesSection
+            withdrawalRequests={withdrawalRequests}
+            onApprove={handleApproveWithdrawal}
+            onReject={handleRejectWithdrawal}
+          />
+        );
+      default:
+        return null;
     }
   }
-
-  const { token } = useAuth();
-
-  const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [providerRequests, setProviderRequests] = useState<ProviderRequest[]>(
-    [],
-  );
-  const [loading, setLoading] = useState(true);
-
-  const dynamicMetrics = [
-    {
-      title: "Usuários",
-      value: String(dashboard?.totalUsers ?? 0),
-      growth: "",
-      period: "cadastrados",
-      color: "#3b82f6",
-      sparkData: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      title: "Clientes",
-      value: String(dashboard?.totalClients ?? 0),
-      growth: "",
-      period: "ativos",
-      color: "#10b981",
-      sparkData: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      title: "Prestadores",
-      value: String(dashboard?.totalProviders ?? 0),
-      growth: "",
-      period: "aprovados",
-      color: "#8b5cf6",
-      sparkData: [1, 2, 3, 4, 5, 6],
-    },
-    {
-      title: "Agendamentos",
-      value: String(dashboard?.totalAppointments ?? 0),
-      growth: "",
-      period: "registrados",
-      color: "#f59e0b",
-      sparkData: [1, 2, 3, 4, 5, 6],
-    },
-  ];
-
-  useEffect(() => {
-    async function loadData() {
-      if (!token) return;
-
-      setLoading(true);
-
-      const [dashboardData, usersData, servicesData, requestsData] =
-        await Promise.all([
-          getAdminDashboard(token),
-          listUsers(token),
-          listAdminServices(token),
-          listProviderRequests(token),
-        ]);
-
-      setDashboard(dashboardData);
-      setUsers(usersData);
-      setServices(servicesData);
-      setProviderRequests(requestsData);
-      setLoading(false);
-    }
-
-    loadData();
-  }, [token]);
 
   return (
     <div className={styles.wrapper}>
@@ -207,21 +297,27 @@ export default function Admin() {
             <nav className={styles.sidebarNav}>
               {sidebarGroups.map((group) => (
                 <div key={group.group} className={styles.sidebarGroup}>
-                  <span className={styles.sidebarGroupLabel}>{group.group}</span>
+                  <span className={styles.sidebarGroupLabel}>
+                    {group.group}
+                  </span>
                   {group.items.map((item) => {
-                    const isActive = activeSidebar === item.id
-                    const Icon = item.icon
+                    const isActive = activeSidebar === item.id;
+                    const Icon = item.icon;
                     return (
                       <button
                         key={item.id}
                         className={`${styles.sidebarItem} ${isActive ? styles.sidebarItemActive : ""}`}
                         onClick={() => setActiveSidebar(item.id)}
                       >
-                        {isActive && <span className={styles.sidebarIndicator} />}
+                        {isActive && (
+                          <span className={styles.sidebarIndicator} />
+                        )}
                         <Icon className={styles.sidebarIcon} size={18} />
-                        <span className={styles.sidebarLabel}>{item.label}</span>
+                        <span className={styles.sidebarLabel}>
+                          {item.label}
+                        </span>
                       </button>
-                    )
+                    );
                   })}
                 </div>
               ))}
@@ -266,7 +362,11 @@ export default function Admin() {
               </svg>
             </div>
           </div>
-          {loading ? <p className={styles.headerSubtitle}>Carregando...</p> : renderSection()}
+          {loading ? (
+            <p className={styles.headerSubtitle}>Carregando...</p>
+          ) : (
+            renderSection()
+          )}
         </main>
       </div>
     </div>

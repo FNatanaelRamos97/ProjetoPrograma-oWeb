@@ -14,12 +14,12 @@ export class ReviewsController {
 
     const review = await reviewsRepository.create({
       ...data,
-      clientId: request.user.id
+      clientId: request.user.id,
     });
 
     if (!review) {
       return response.status(409).json({
-        message: "Você já avaliou este agendamento"
+        message: "Você já avaliou este agendamento",
       });
     }
 
@@ -31,7 +31,7 @@ export class ReviewsController {
 
     const [reviews, avg] = await Promise.all([
       reviewsRepository.findByService(serviceId),
-      reviewsRepository.getAverageRating(serviceId)
+      reviewsRepository.getAverageRating(serviceId),
     ]);
 
     return response.json({ reviews, average: avg.avg, total: avg.count });
@@ -40,6 +40,12 @@ export class ReviewsController {
   async findByProvider(request: Request, response: Response) {
     const providerId = Number(request.params.providerId);
     const reviews = await reviewsRepository.findByProvider(providerId);
+    return response.json(reviews);
+  }
+
+  async findAllAdmin(request: Request, response: Response) {
+    const reviews = await reviewsRepository.findAllAdmin();
+
     return response.json(reviews);
   }
 }

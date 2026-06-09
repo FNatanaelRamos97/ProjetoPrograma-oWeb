@@ -1,6 +1,6 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../db";
-import { transactions, users } from "../db/schema";
+import { transactions, users, withdrawalRequests } from "../db/schema";
 
 export class WalletRepository {
   async getBalance(userId: number) {
@@ -19,8 +19,8 @@ export class WalletRepository {
       .where(
         and(
           eq(transactions.userId, userId),
-          eq(transactions.status, "liberado")
-        )
+          eq(transactions.status, "liberado"),
+        ),
       );
 
     return Number(result[0]?.total ?? 0);
@@ -33,8 +33,8 @@ export class WalletRepository {
       .where(
         and(
           eq(transactions.userId, userId),
-          eq(transactions.status, "bloqueado")
-        )
+          eq(transactions.status, "bloqueado"),
+        ),
       );
 
     return Number(result[0]?.total ?? 0);
@@ -53,7 +53,7 @@ export class WalletRepository {
         type: "deposito",
         amount,
         description,
-        status: "liberado"
+        status: "liberado",
       })
       .returning();
 
@@ -76,7 +76,7 @@ export class WalletRepository {
         type: "saque",
         amount: -amount,
         description,
-        status: "liberado"
+        status: "liberado",
       })
       .returning();
 
@@ -89,7 +89,7 @@ export class WalletRepository {
     amount: number,
     description: string,
     referenceType: string,
-    referenceId: number
+    referenceId: number,
   ) {
     await db
       .update(users)
@@ -105,21 +105,19 @@ export class WalletRepository {
         description,
         status: "bloqueado",
         referenceType,
-        referenceId
+        referenceId,
       })
       .returning();
 
-    await db
-      .insert(transactions)
-      .values({
-        userId: providerId,
-        type: "recebimento",
-        amount,
-        description,
-        status: "bloqueado",
-        referenceType,
-        referenceId
-      });
+    await db.insert(transactions).values({
+      userId: providerId,
+      type: "recebimento",
+      amount,
+      description,
+      status: "bloqueado",
+      referenceType,
+      referenceId,
+    });
 
     return outTx[0];
   }
@@ -132,14 +130,18 @@ export class WalletRepository {
         and(
           eq(transactions.referenceType, referenceType),
           eq(transactions.referenceId, referenceId),
-          eq(transactions.status, "bloqueado")
-        )
+          eq(transactions.status, "bloqueado"),
+        ),
       );
 
     return true;
   }
 
-  async cancelPayment(referenceType: string, referenceId: number, cancellationReason: string) {
+  async cancelPayment(
+    referenceType: string,
+    referenceId: number,
+    cancellationReason: string,
+  ) {
     const txs = await db
       .select()
       .from(transactions)
@@ -147,12 +149,12 @@ export class WalletRepository {
         and(
           eq(transactions.referenceType, referenceType),
           eq(transactions.referenceId, referenceId),
-          eq(transactions.status, "bloqueado")
-        )
+          eq(transactions.status, "bloqueado"),
+        ),
       );
 
-    const clientTx = txs.find(tx => tx.type === "pagamento");
-    const providerTx = txs.find(tx => tx.type === "recebimento");
+    const clientTx = txs.find((tx) => tx.type === "pagamento");
+    const providerTx = txs.find((tx) => tx.type === "recebimento");
 
     if (clientTx) {
       await db
@@ -165,28 +167,26 @@ export class WalletRepository {
       .update(transactions)
       .set({
         status: "devolvido",
-        cancellationReason
+        cancellationReason,
       })
       .where(
         and(
           eq(transactions.referenceType, referenceType),
           eq(transactions.referenceId, referenceId),
-          eq(transactions.status, "bloqueado")
-        )
+          eq(transactions.status, "bloqueado"),
+        ),
       );
 
     if (clientTx) {
-      await db
-        .insert(transactions)
-        .values({
-          userId: clientTx.userId,
-          type: "estorno",
-          amount: Math.abs(clientTx.amount),
-          description: `Estorno - ${cancellationReason}`,
-          status: "liberado",
-          referenceType,
-          referenceId
-        });
+      await db.insert(transactions).values({
+        userId: clientTx.userId,
+        type: "estorno",
+        amount: Math.abs(clientTx.amount),
+        description: `Estorno - ${cancellationReason}`,
+        status: "liberado",
+        referenceType,
+        referenceId,
+      });
     }
 
     return true;
@@ -199,8 +199,8 @@ export class WalletRepository {
       .where(
         and(
           eq(transactions.userId, userId),
-          eq(transactions.status, "bloqueado")
-        )
+          eq(transactions.status, "bloqueado"),
+        ),
       )
       .orderBy(desc(transactions.createdAt));
   }
@@ -225,9 +225,127 @@ export class WalletRepository {
         cancellationReason: transactions.cancellationReason,
         referenceType: transactions.referenceType,
         referenceId: transactions.referenceId,
-        createdAt: transactions.createdAt
+        createdAt: transactions.createdAt,
       })
       .from(transactions)
       .orderBy(desc(transactions.createdAt));
+  }
+
+  async requestWithdrawal(
+    providerId: number,
+    amount: number,
+    description: string,
+  ) {
+    const available = await this.getAvailableBalance(providerId);
+
+    if (available < amount) {
+      return null;
+    }
+
+    const result = await db
+      .insert(withdrawalRequests)
+      .values({
+        providerId,
+        amount,
+        description: description || "Solicitação de repasse",
+        status: "solicitado",
+      })
+      .returning();
+
+    return result[0];
+  }
+
+  async listMyWithdrawalRequests(providerId: number) {
+    return db
+      .select()
+      .from(withdrawalRequests)
+      .where(eq(withdrawalRequests.providerId, providerId))
+      .orderBy(desc(withdrawalRequests.createdAt));
+  }
+
+  async listAllWithdrawalRequests() {
+    return db
+      .select({
+        id: withdrawalRequests.id,
+        providerId: withdrawalRequests.providerId,
+        providerName: users.name,
+        providerEmail: users.email,
+        amount: withdrawalRequests.amount,
+        status: withdrawalRequests.status,
+        description: withdrawalRequests.description,
+        adminNote: withdrawalRequests.adminNote,
+        createdAt: withdrawalRequests.createdAt,
+        decidedAt: withdrawalRequests.decidedAt,
+      })
+      .from(withdrawalRequests)
+      .innerJoin(users, eq(users.id, withdrawalRequests.providerId))
+      .orderBy(desc(withdrawalRequests.createdAt));
+  }
+
+  async approveWithdrawalRequest(id: number, adminNote?: string) {
+    const result = await db
+      .select()
+      .from(withdrawalRequests)
+      .where(eq(withdrawalRequests.id, id));
+
+    const request = result[0];
+
+    if (!request || request.status !== "solicitado") {
+      return null;
+    }
+
+    const available = await this.getAvailableBalance(request.providerId);
+
+    if (available < request.amount) {
+      return null;
+    }
+
+    await db.insert(transactions).values({
+      userId: request.providerId,
+      type: "saque",
+      amount: -request.amount,
+      description: `Repasse aprovado #${id}`,
+      status: "liberado",
+      referenceType: "withdrawal_request",
+      referenceId: id,
+    });
+
+    await db
+      .update(users)
+      .set({
+        balance: sql`${users.balance} - ${request.amount}`,
+      })
+      .where(eq(users.id, request.providerId));
+
+    const updated = await db
+      .update(withdrawalRequests)
+      .set({
+        status: "pago",
+        adminNote: adminNote ?? null,
+        decidedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(eq(withdrawalRequests.id, id))
+      .returning();
+
+    return updated[0];
+  }
+
+  async rejectWithdrawalRequest(id: number, adminNote?: string) {
+    const result = await db
+      .update(withdrawalRequests)
+      .set({
+        status: "recusado",
+        adminNote: adminNote ?? null,
+        decidedAt: sql`CURRENT_TIMESTAMP`,
+      })
+      .where(
+        and(
+          eq(withdrawalRequests.id, id),
+          eq(withdrawalRequests.status, "solicitado"),
+        ),
+      )
+      .returning();
+
+    return result[0] ?? null;
   }
 }

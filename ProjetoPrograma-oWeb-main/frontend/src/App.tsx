@@ -21,6 +21,8 @@ import Configuracoes from './pages/Configuracoes/Configuracoes'
 import SobreConectServ from './pages/SobreConectServ/SobreConectServ'
 import AjudaSuporte from './pages/AjudaSuporte/AjudaSuporte'
 import TornarSePrestador from './pages/TornarSePrestador/TornarSePrestador'
+import AgendaPrestador from "./pages/AgendaPrestador/AgendaPrestador";
+import Carteira from './pages/Carteira/Carteira'
 
 export default function App() {
   return (
@@ -50,6 +52,8 @@ export default function App() {
         <Route path="/cadastrar-servico" element={<CadastroServico />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/tornar-se-prestador" element={<TornarSePrestador />} />
+        <Route path="/minha-agenda" element={<AgendaPrestador />} />
+        <Route path="/carteira" element={<Carteira />} />
       </Routes>
     </AuthProvider>
   )

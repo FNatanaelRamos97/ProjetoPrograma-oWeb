@@ -14,29 +14,37 @@ interface CarouselSlide {
 }
 
 function getCarouselSlides(product: Service): CarouselSlide[] {
-  const urls = (product.imageUrls && product.imageUrls.length > 0)
-    ? product.imageUrls
-    : (product.imageUrl ? [product.imageUrl] : []);
+  const urls =
+    product.imageUrls && product.imageUrls.length > 0
+      ? product.imageUrls
+      : product.imageUrl
+        ? [product.imageUrl]
+        : [];
   if (urls.length > 0) {
     return urls.map((url, i) => ({
       isImage: true,
       url,
-      label: `${product.name} - Imagem ${i + 1}`
+      label: `${product.name} - Imagem ${i + 1}`,
     }));
   }
   return [
-    { isImage: false, gradient: 'linear-gradient(135deg, #2563eb, #1e40af)', icon: '📷', label: 'Imagem não disponível' },
+    {
+      isImage: false,
+      gradient: "linear-gradient(135deg, #2563eb, #1e40af)",
+      icon: "📷",
+      label: "Imagem não disponível",
+    },
   ];
 }
 
 const includedItems = [
-  'Serviço profissional de qualidade',
-  'Atendimento personalizado',
-  'Profissional verificado',
-  'Garantia de satisfação',
-  'Orçamento sem compromisso',
-  'Suporte dedicado',
-]
+  "Serviço profissional de qualidade",
+  "Atendimento personalizado",
+  "Profissional verificado",
+  "Garantia de satisfação",
+  "Orçamento sem compromisso",
+  "Suporte dedicado",
+];
 
 function Stars({ count }: { count: number }) {
   return (
@@ -72,9 +80,9 @@ export default function VerDetalhes() {
     );
   }
 
-  const carouselSlides = getCarouselSlides(product)
-  const rating = { stars: Math.min(4 + (product.id % 2), 5), count: 10 + product.id * 3 }
-  const ratingNum = (4.5 + (product.id % 5) * 0.1).toFixed(1)
+  const carouselSlides = getCarouselSlides(product);
+  const ratingNum = Number(product.averageRating ?? 0);
+  const ratingCount = Number(product.totalReviews ?? 0);
 
   return (
     <div className={styles.page}>
@@ -113,15 +121,24 @@ export default function VerDetalhes() {
               </button>
               <div
                 className={styles.carouselSlide}
-                style={carouselSlides[current].isImage
-                  ? { backgroundImage: `url(${carouselSlides[current].url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                  : { background: carouselSlides[current].gradient }
+                style={
+                  carouselSlides[current].isImage
+                    ? {
+                        backgroundImage: `url(${carouselSlides[current].url})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : { background: carouselSlides[current].gradient }
                 }
               >
                 {!carouselSlides[current].isImage && (
                   <>
-                    <span className={styles.carouselIcon}>{carouselSlides[current].icon}</span>
-                    <span className={styles.carouselLabel}>{carouselSlides[current].label}</span>
+                    <span className={styles.carouselIcon}>
+                      {carouselSlides[current].icon}
+                    </span>
+                    <span className={styles.carouselLabel}>
+                      {carouselSlides[current].label}
+                    </span>
                   </>
                 )}
               </div>
@@ -150,14 +167,21 @@ export default function VerDetalhes() {
                 {carouselSlides.map((slide, i) => (
                   <button
                     key={i}
-                    className={`${styles.thumb} ${i === current ? styles.thumbActive : ''}`}
+                    className={`${styles.thumb} ${i === current ? styles.thumbActive : ""}`}
                     onClick={() => setCurrent(i)}
-                    style={slide.isImage
-                      ? { backgroundImage: `url(${slide.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                      : { background: slide.gradient }
+                    style={
+                      slide.isImage
+                        ? {
+                            backgroundImage: `url(${slide.url})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }
+                        : { background: slide.gradient }
                     }
                   >
-                    {!slide.isImage && <span className={styles.thumbIcon}>{slide.icon}</span>}
+                    {!slide.isImage && (
+                      <span className={styles.thumbIcon}>{slide.icon}</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -187,10 +211,10 @@ export default function VerDetalhes() {
             </div>
 
             <div className={styles.ratingRow}>
-              <Stars count={rating.stars} />
-              <span className={styles.ratingNum}>{ratingNum}</span>
+              <Stars count={Math.round(ratingNum)} />
+              <span className={styles.ratingNum}>{ratingNum.toFixed(1)}</span>
               <span className={styles.ratingCount}>
-                ({rating.count} avaliações)
+                ({ratingCount} avaliações)
               </span>
             </div>
 

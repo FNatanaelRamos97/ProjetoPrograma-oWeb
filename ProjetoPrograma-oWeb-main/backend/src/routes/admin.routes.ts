@@ -12,5 +12,11 @@ adminRoutes.get("/dashboard", controller.dashboard);
 adminRoutes.get("/users", controller.users);
 adminRoutes.get("/services", controller.services);
 adminRoutes.get("/appointments", controller.appointments);
+adminRoutes.get(
+  "/appointments",
+  authMiddleware,
+  requireRole(["admin"]),
+  controller.listAppointments,
+);
 
 export { adminRoutes };

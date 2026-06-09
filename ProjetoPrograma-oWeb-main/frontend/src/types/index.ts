@@ -14,6 +14,8 @@ export interface Service {
   provider_id: number
   provider_name: string
   provider_image?: string | null
+  averageRating?: number
+  totalReviews?: number
 }
 
 export interface User {
@@ -36,6 +38,15 @@ export interface AvailabilityDay {
   date: string
   day: number
   available: boolean
+  reason?: string | null;
+}
+
+export interface ProviderUnavailableDate {
+  id: number;
+  providerId: number;
+  unavailableDate: string;
+  reason: string;
+  createdAt: string;
 }
 
 export interface Appointment {
@@ -44,13 +55,13 @@ export interface Appointment {
   providerId: number
   clientId: number
   appointmentDate: string
-  status: 'pendente' | 'confirmado' | 'cancelado'
+  status: AppointmentStatus
 }
 
 export interface ClientAppointment {
   id: number
   appointmentDate: string
-  status: 'pendente' | 'confirmado' | 'cancelado'
+  status: AppointmentStatus
   serviceId: number
   serviceName: string
   providerId: number
@@ -58,6 +69,7 @@ export interface ClientAppointment {
   clientId: number
   price: number
   cancellationReason?: string | null
+  completedAt?: string | null
   createdAt: string
 }
 
@@ -148,3 +160,11 @@ export interface SalesStats {
   completedCount: number
   pendingCount: number
 }
+
+export type AppointmentStatus =
+  | 'pendente_pagamento'
+  | 'pago'
+  | 'em_execucao'
+  | 'concluido'
+  | 'cancelado'
+  | 'reembolsado'

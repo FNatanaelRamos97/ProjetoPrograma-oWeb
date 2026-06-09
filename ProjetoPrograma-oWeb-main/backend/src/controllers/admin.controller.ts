@@ -3,6 +3,9 @@ import { AdminRepository } from "../repositories/admin.repository";
 import { UsersRepository } from "../repositories/users.repository";
 import { ServicesRepository } from "../repositories/services.repository";
 import { AppointmentsRepository } from "../repositories/appointments.repository";
+import { db } from "../db";
+import { eq } from "drizzle-orm";
+import { appointments, services } from "../db/schema";
 
 const adminRepository = new AdminRepository();
 const usersRepository = new UsersRepository();
@@ -28,5 +31,23 @@ export class AdminController {
   async appointments(request: Request, response: Response) {
     const appointments = await appointmentsRepository.findAll();
     return response.json(appointments);
+  }
+
+  async listAppointments(request: Request, response: Response) {
+    const data = await db
+      .select({
+        id: appointments.id,
+        serviceId: appointments.serviceId,
+        providerId: appointments.providerId,
+        clientId: appointments.clientId,
+        appointmentDate: appointments.appointmentDate,
+        status: appointments.status,
+        createdAt: appointments.createdAt,
+        serviceName: services.name,
+      })
+      .from(appointments)
+      .leftJoin(services, eq(appointments.serviceId, services.id));
+
+    return response.json(data);
   }
 }

@@ -7,7 +7,9 @@ import { reviewsRoutes } from "./reviews.routes";
 import { salesLogsRoutes } from "./sales-logs.routes";
 import { servicesRoutes } from "./services.routes";
 import { usersRoutes } from "./users.routes";
+import { paymentsRoutes } from "./payments.routes";
 import { walletRoutes } from "./wallet.routes";
+import { providerUnavailableDatesRoutes } from "./provider-unavailable-dates.routes";
 
 const routes = Router();
 
@@ -27,5 +29,8 @@ routes.use("/sales-logs", salesLogsRoutes);
 routes.use("/appointments", appointmentsRoutes);
 routes.use("/wallet", walletRoutes);
 routes.use("/admin", adminRoutes);
+routes.use("/provider-unavailable-dates", providerUnavailableDatesRoutes);
+routes.use("/payments", paymentsRoutes);
+
 
 export { routes };

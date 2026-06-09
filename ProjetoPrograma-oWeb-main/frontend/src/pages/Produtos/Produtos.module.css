@@ -354,9 +354,8 @@
 /* ── Delete ── */
 
 .deleteBtn {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  align-self: flex-end;
+  margin-top: 6px;
   padding: 6px 14px;
   border-radius: 8px;
   border: 1px solid rgba(239, 68, 68, 0.15);

@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  real,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -16,14 +22,14 @@ export const users = sqliteTable("users", {
   balance: real("balance").notNull().default(0),
 
   role: text("role", {
-    enum: ["cliente", "prestador", "prestador_pendente", "admin"]
+    enum: ["cliente", "prestador", "prestador_pendente", "admin"],
   })
     .notNull()
     .default("cliente"),
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const services = sqliteTable("services", {
@@ -45,7 +51,7 @@ export const services = sqliteTable("services", {
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const providerRequests = sqliteTable("provider_requests", {
@@ -56,7 +62,7 @@ export const providerRequests = sqliteTable("provider_requests", {
     .references(() => users.id),
 
   status: text("status", {
-    enum: ["pendente", "aprovado", "recusado"]
+    enum: ["pendente", "aprovado", "recusado"],
   })
     .notNull()
     .default("pendente"),
@@ -65,7 +71,7 @@ export const providerRequests = sqliteTable("provider_requests", {
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const providerAvailability = sqliteTable("provider_availability", {
@@ -77,8 +83,32 @@ export const providerAvailability = sqliteTable("provider_availability", {
 
   dayOfWeek: integer("day_of_week").notNull(),
   startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull()
+  endTime: text("end_time").notNull(),
 });
+
+export const providerUnavailableDates = sqliteTable(
+  "provider_unavailable_dates",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    providerId: integer("provider_id")
+      .notNull()
+      .references(() => users.id),
+
+    unavailableDate: text("unavailable_date").notNull(),
+
+    reason: text("reason").notNull().default("Indisponível"),
+
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    uniqueProviderUnavailableDate: uniqueIndex(
+      "provider_unavailable_dates_provider_date_unique",
+    ).on(table.providerId, table.unavailableDate),
+  }),
+);
 
 export const appointments = sqliteTable(
   "appointments",
@@ -100,7 +130,7 @@ export const appointments = sqliteTable(
     appointmentDate: text("appointment_date").notNull(),
 
     status: text("status", {
-      enum: ["pendente", "confirmado", "cancelado"]
+      enum: ["pendente", "confirmado", "concluido", "cancelado"],
     })
       .notNull()
       .default("pendente"),
@@ -109,14 +139,16 @@ export const appointments = sqliteTable(
 
     completedAt: text("completed_at"),
 
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => ({
-    uniqueProviderDate: uniqueIndex("appointments_provider_date_unique")
-      .on(table.providerId, table.appointmentDate)
-  })
+    uniqueProviderDate: uniqueIndex("appointments_provider_date_unique").on(
+      table.providerId,
+      table.appointmentDate,
+    ),
+  }),
 );
 
 export const reviews = sqliteTable("reviews", {
@@ -143,7 +175,7 @@ export const reviews = sqliteTable("reviews", {
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const transactions = sqliteTable("transactions", {
@@ -154,15 +186,17 @@ export const transactions = sqliteTable("transactions", {
     .references(() => users.id),
 
   type: text("type", {
-    enum: ["deposito", "saque", "pagamento", "recebimento", "estorno"]
+    enum: ["deposito", "saque", "pagamento", "recebimento", "estorno"],
   }).notNull(),
 
   amount: real("amount").notNull(),
   description: text("description").notNull().default(""),
 
   status: text("status", {
-    enum: ["liberado", "bloqueado", "devolvido"]
-  }).notNull().default("liberado"),
+    enum: ["liberado", "bloqueado", "devolvido"],
+  })
+    .notNull()
+    .default("liberado"),
 
   cancellationReason: text("cancellation_reason"),
 
@@ -171,7 +205,7 @@ export const transactions = sqliteTable("transactions", {
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const serviceImages = sqliteTable("service_images", {
@@ -183,17 +217,15 @@ export const serviceImages = sqliteTable("service_images", {
 
   imageUrl: text("image_url").notNull(),
 
-  sortOrder: integer("sort_order").notNull().default(0)
+  sortOrder: integer("sort_order").notNull().default(0),
 });
 
 export const salesLogs = sqliteTable("sales_logs", {
   id: integer("id").primaryKey({ autoIncrement: true }),
 
-  appointmentId: integer("appointment_id")
-    .references(() => appointments.id),
+  appointmentId: integer("appointment_id").references(() => appointments.id),
 
-  serviceId: integer("service_id")
-    .references(() => services.id),
+  serviceId: integer("service_id").references(() => services.id),
 
   clientId: integer("client_id")
     .notNull()
@@ -209,5 +241,80 @@ export const salesLogs = sqliteTable("sales_logs", {
 
   createdAt: text("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const payments = sqliteTable(
+  "payments",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    appointmentId: integer("appointment_id")
+      .notNull()
+      .references(() => appointments.id),
+
+    serviceId: integer("service_id")
+      .notNull()
+      .references(() => services.id),
+
+    clientId: integer("client_id")
+      .notNull()
+      .references(() => users.id),
+
+    providerId: integer("provider_id")
+      .notNull()
+      .references(() => users.id),
+
+    grossAmount: real("gross_amount").notNull(),
+    commissionAmount: real("commission_amount").notNull(),
+    providerAmount: real("provider_amount").notNull(),
+
+    currency: text("currency").notNull().default("brl"),
+
+    stripeCheckoutSessionId: text("stripe_checkout_session_id").notNull(),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+
+    status: text("status", {
+      enum: ["checkout_criado", "pago", "cancelado", "reembolsado"]
+    })
+      .notNull()
+      .default("checkout_criado"),
+
+    paidAt: text("paid_at"),
+    cancelDeadlineAt: text("cancel_deadline_at"),
+
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`)
+  },
+  (table) => ({
+    uniqueStripeSession: uniqueIndex("payments_stripe_session_unique")
+      .on(table.stripeCheckoutSessionId)
+  })
+);
+
+export const withdrawalRequests = sqliteTable("withdrawal_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+
+  providerId: integer("provider_id")
+    .notNull()
+    .references(() => users.id),
+
+  amount: real("amount").notNull(),
+
+  status: text("status", {
+    enum: ["solicitado", "aprovado", "recusado", "pago"]
+  })
+    .notNull()
+    .default("solicitado"),
+
+  description: text("description").notNull().default("Solicitação de repasse"),
+
+  adminNote: text("admin_note"),
+
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+
+  decidedAt: text("decided_at")
 });

@@ -347,14 +347,6 @@
   color: #475569;
 }
 
-.legendRow {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  font-size: 12px;
-  color: #64748b;
-}
-
 .legend span {
   display: flex;
   align-items: center;
@@ -375,4 +367,12 @@
 
 .legendUnavailable {
   background: #cbd5e1;
+}
+
+.legendRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #64748b;
 }

@@ -7,6 +7,21 @@
   overflow: hidden;
 }
 
+.btnContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.otherMethodBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .bgCircle1,
 .bgCircle2,
 .bgCircle3 {

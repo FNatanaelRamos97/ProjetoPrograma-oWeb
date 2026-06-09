@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { appointments, reviews, services, users } from "../db/schema";
+import { sql } from "drizzle-orm";
 
 export class ReviewsRepository {
   async create(data: {
@@ -11,14 +12,29 @@ export class ReviewsRepository {
     rating: number;
     comment: string;
   }) {
+    const appointment = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.id, data.appointmentId),
+          eq(appointments.clientId, data.clientId),
+          eq(appointments.serviceId, data.serviceId),
+          eq(appointments.providerId, data.providerId),
+          eq(appointments.status, "concluido"),
+        ),
+      );
+
+    if (!appointment[0]) return null;
+
     const existing = await db
       .select()
       .from(reviews)
       .where(
         and(
           eq(reviews.appointmentId, data.appointmentId),
-          eq(reviews.clientId, data.clientId)
-        )
+          eq(reviews.clientId, data.clientId),
+        ),
       );
 
     if (existing[0]) return null;
@@ -34,7 +50,7 @@ export class ReviewsRepository {
         rating: reviews.rating,
         comment: reviews.comment,
         clientName: users.name,
-        createdAt: reviews.createdAt
+        createdAt: reviews.createdAt,
       })
       .from(reviews)
       .innerJoin(users, eq(users.id, reviews.clientId))
@@ -50,7 +66,7 @@ export class ReviewsRepository {
         comment: reviews.comment,
         clientName: users.name,
         serviceName: services.name,
-        createdAt: reviews.createdAt
+        createdAt: reviews.createdAt,
       })
       .from(reviews)
       .innerJoin(users, eq(users.id, reviews.clientId))
@@ -62,12 +78,37 @@ export class ReviewsRepository {
   async getAverageRating(serviceId: number) {
     const result = await db
       .select({
-        avg: reviews.rating,
-        count: reviews.id
+        avg: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
+        count: sql<number>`COUNT(${reviews.id})`,
       })
       .from(reviews)
       .where(eq(reviews.serviceId, serviceId));
 
-    return result[0] ?? { avg: 0, count: 0 };
+    return {
+      avg: Number(result[0]?.avg ?? 0),
+      count: Number(result[0]?.count ?? 0),
+    };
+  }
+
+  async findAllAdmin() {
+    const rows = await db
+      .select({
+        id: reviews.id,
+        appointmentId: reviews.appointmentId,
+        serviceId: reviews.serviceId,
+        serviceName: services.name,
+        clientId: reviews.clientId,
+        clientName: users.name,
+        providerId: reviews.providerId,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+      })
+      .from(reviews)
+      .innerJoin(services, eq(services.id, reviews.serviceId))
+      .innerJoin(users, eq(users.id, reviews.clientId))
+      .orderBy(reviews.createdAt);
+
+    return rows;
   }
 }

@@ -1,16 +1,41 @@
 import { eq, inArray } from "drizzle-orm";
 import { db } from "../db";
-import { services, users, serviceImages } from "../db/schema";
+import { services, users, serviceImages, reviews } from "../db/schema";
 import type { CreateServiceDTO, UpdateServiceDTO } from "../dtos/services.dto";
+import { sql } from "drizzle-orm";
 
 type CreateServiceRepositoryDTO = CreateServiceDTO & {
   providerId: number;
   imageUrls?: string[];
 };
 
+async function attachRatings(serviceRows: any[]) {
+  if (serviceRows.length === 0) return serviceRows;
+
+  const rows = await Promise.all(
+    serviceRows.map(async (service) => {
+      const result = await db
+        .select({
+          avg: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
+          count: sql<number>`COUNT(${reviews.id})`,
+        })
+        .from(reviews)
+        .where(eq(reviews.serviceId, service.id));
+
+      return {
+        ...service,
+        averageRating: Number(result[0]?.avg ?? 0),
+        totalReviews: Number(result[0]?.count ?? 0),
+      };
+    }),
+  );
+
+  return rows;
+}
+
 async function attachServiceImages(serviceRows: any[]) {
   if (serviceRows.length === 0) return [];
-  const ids = serviceRows.map(s => s.id);
+  const ids = serviceRows.map((s) => s.id);
   const images = await db
     .select()
     .from(serviceImages)
@@ -23,9 +48,9 @@ async function attachServiceImages(serviceRows: any[]) {
     imageMap[img.serviceId].push(img.imageUrl);
   }
 
-  return serviceRows.map(s => ({
+  return serviceRows.map((s) => ({
     ...s,
-    imageUrls: imageMap[s.id] || []
+    imageUrls: imageMap[s.id] || [],
   }));
 }
 
@@ -45,7 +70,7 @@ export class ServicesRepository {
         estimatedTime: data.estimatedTime,
         location: data.location,
         imageUrl: primaryImage,
-        providerId: data.providerId
+        providerId: data.providerId,
       })
       .returning();
 
@@ -56,8 +81,8 @@ export class ServicesRepository {
         imageUrls.map((url, i) => ({
           serviceId: service.id,
           imageUrl: url,
-          sortOrder: i
-        }))
+          sortOrder: i,
+        })),
       );
     }
 
@@ -78,13 +103,14 @@ export class ServicesRepository {
         imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name,
-        provider_image: users.profileImageUrl
+        provider_image: users.profileImageUrl,
       })
       .from(services)
       .innerJoin(users, eq(users.id, services.providerId))
       .orderBy(services.id);
 
-    return attachServiceImages(rows);
+    const withImages = await attachServiceImages(rows);
+    return attachRatings(withImages);
   }
 
   async findByProviderId(providerId: number) {
@@ -101,13 +127,14 @@ export class ServicesRepository {
         imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name,
-        provider_image: users.profileImageUrl
+        provider_image: users.profileImageUrl,
       })
       .from(services)
       .innerJoin(users, eq(users.id, services.providerId))
       .where(eq(services.providerId, providerId));
 
-    return attachServiceImages(rows);
+    const withImages = await attachServiceImages(rows);
+    return attachRatings(withImages);
   }
 
   async findById(id: number) {
@@ -124,7 +151,7 @@ export class ServicesRepository {
         imageUrl: services.imageUrl,
         provider_id: services.providerId,
         provider_name: users.name,
-        provider_image: users.profileImageUrl
+        provider_image: users.profileImageUrl,
       })
       .from(services)
       .innerJoin(users, eq(users.id, services.providerId))
@@ -139,7 +166,11 @@ export class ServicesRepository {
       .where(eq(serviceImages.serviceId, id))
       .orderBy(serviceImages.sortOrder);
 
-    return { ...service, imageUrls: images.map(i => i.imageUrl) };
+    const withRating = await attachRatings([
+      { ...service, imageUrls: images.map((i) => i.imageUrl) },
+    ]);
+    return withRating[0];
+    return { ...service, imageUrls: images.map((i) => i.imageUrl) };
   }
 
   async update(id: number, data: UpdateServiceDTO) {
