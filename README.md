@@ -6,14 +6,128 @@
 - Git
 - Stripe CLI
 
-Para conferir no terminal:
+Para conferir no terminal nos sistemas Unix-like (Linux e macOS) ou gitbash do Windows, use o comando:
 
-node -v
-npm -v
-git --version
+```bash
+echo "node version $(node -v)" && echo "npm version $(npm -v)" && git --version && stripe --version
+```
+
+Para conferir no WindowsPowerShell, use o comando:
+
+```powershell
+Write-Host "node version $(node -v)"; Write-Host "npm version $(npm -v)"; git --version; stripe --version
+``` 
+
+
+## Instalando o Stripe CLI
+
+Caso o seu sistema não possua o stripe instalado, use um dos gerenciadores de acordo com o seu sistema operacional:
+
+- **Linux debian ou unbutu** - `APT`;
+- **Windows** - `WinGet` ou `Scoop`;
+- **macOS** - `Homebrew`;
+
+### Linux debian ou unbutu
+
+Na linha de comando desse sistema siga os seguintes passos:
+
+1. Baixe a chave pública da Stripe e a converta para o formato usado pelo repositório APT
+
+```bash
+curl -fsSL https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | sudo gpg --dearmor -o /usr/share/keyrings/stripe.gpg
+```
+
+2. Adicionando o repositória da Stripe e salvando-o na configuração do APT
+
+```bash
+echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee /etc/apt/sources.list.d/stripe.list
+```
+
+3. Atualize os índices do APT e instale o Stripe CLI
+
+```bash
+sudo apt update && sudo apt install stripe
+```
+
+### No WindowsPowerShell
+
+#### WinGet
+
+Abra o PowerShell do Windows e digite os seguintes comandos:
+
+1. Instale o Stripe CLI
+
+```PowerShell
+winget install Stripe.StripeCLI
+```
+
+2. Confirme a instalação 
+
+```
 stripe --version
+```
 
----
+3. Faça o login
+
+```PowerShell
+stripe login
+```
+
+A CLI exibirá um código e abrirá o navegador para autenticar sua conta Stripe.
+
+#### Scoop
+
+1. Verifique se o Scoop está instalado
+
+```PowerShell
+scoop --version
+```
+
+2. Adicione o bucket da Stripe
+
+```PowerShell
+scoop bucket add stripe https://github.com/stripe/scoop-stripe-cli.git
+``` 
+
+3. Instale a Stripe CLI
+
+```PowerShell
+scoop install stripe
+```
+
+4. Confirme a instalação
+
+```PowerShell
+stripe --version
+```
+
+5. Faça o login
+
+```PowerShell
+stripe login
+```
+
+A CLI exibirá um código e abrirá o navegador para autenticar sua conta Stripe.
+
+### No macOS 
+
+Abra o terminal no macOS e siga os seguintes passo:
+
+1. Instale a Stripe CLI
+
+```bash
+brew install stripe/stripe-cli/stripe
+```
+
+2. Faça o login
+
+```bash
+stripe login
+```
+
+A Stripe CLI vai abrir o navegador e você pode logar com suas credenciais.
+
+
 ## Baixar projeto
 
 ```bash
@@ -21,25 +135,6 @@ git clone https://github.com/DavidBeckhan010/ProjetoPrograma-oWeb
 cd ProjetoPrograma-oWeb-main
 ```
 
-## Instalando o Stripe CLI
-
-No PowerShell ou Git Bash:
-
-```bash
-powershell -ExecutionPolicy Bypass -Command "irm get.scoop.sh | iex"
-```
-Confira se está instalado com o comando:
-
-```bash
-scoop --version
-```
-Instale o stripe:
-
-```bash
-scoop bucket add stripe https://github.com/stripe/scoop-stripe-cli.git scoop install stripe
-```
-
----
 
 ## Backend
 
