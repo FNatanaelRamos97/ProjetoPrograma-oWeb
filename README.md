@@ -5,8 +5,7 @@
 | Matrícula | Nome | Atribuições |
 |---|---|---|
 |UC24100355 |David Beckhan Santana Vieira |Criação e estruturação do frontend e backend com atualizações, melhorias e correções de bugs que as envolveram. |
-|UC24101229 |Davi Araújo Chagas |Criação e estruturação do frontend e backend com atualizações, melhorias e correções de bugs que as envolveram.
- |
+|UC24101229 |Davi Araújo Chagas |Criação e estruturação do frontend e backend com atualizações, melhorias e correções de bugs que as envolveram.|
 |UC24101947 |Enzo Vieira de Souza |Criação de frontend, gravação e montagem de video para a apresentação alimentação de informações no site com ideias de melhorias e ajustes na frontend. |
 |UC24101445 |Francisco Natanael Ramos dos Santos |Elaboração do Bills Modal Canvas, elevator pitch, alimentação de informações no site com ideias de melhorias e pequenos ajustes nos layouts. |
 |UC24102644 |João Paulo Batista dos Santos |Criação de frontend, gravação e montagem de video para a apresentação, alimentação de informações no site com ideias de melhorias e ajustes na frontend. |
