@@ -4,11 +4,11 @@
 
 | Matrícula | Nome | Atribuições |
 |---|---|---|
-|UC24100355 |David Beckhan Santana Vieira |Criação do frontend com todas as atualizações e melhorias que envolveram |
-|UC24101229 |Davi Araújo Chagas |Criação, estruturação e melhorias no backend/banco de dados drizzle |
-|UC24101947 |Enzo Vieira de Souza | |
-|UC24101445 |Francisco Natanael Ramos dos Santos |Atualização e melhorias no SQLite/ Alimentação de informações no site ideias de melhorias e pequenos ajustes nos layouts |
-|UC24102644 |João Paulo Batista dos Santos |Alimentação de informações no site ideias de melhorias e ajustes na frontend |
+|UC24100355 |David Beckhan Santana Vieira |Criação e estruturação do frontend e backend com atualizações, melhorias e correções de bugs que as envolveram. |
+|UC24101229 |Davi Araújo Chagas |Criação e estruturação do frontend e backend com atualizações, melhorias e correções de bugs que as envolveram.|
+|UC24101947 |Enzo Vieira de Souza |Criação de frontend, gravação e montagem de video para a apresentação alimentação de informações no site com ideias de melhorias e ajustes na frontend. |
+|UC24101445 |Francisco Natanael Ramos dos Santos |Elaboração do Bills Modal Canvas, elevator pitch, alimentação de informações no site com ideias de melhorias e pequenos ajustes nos layouts. |
+|UC24102644 |João Paulo Batista dos Santos |Criação de frontend, gravação e montagem de video para a apresentação, alimentação de informações no site com ideias de melhorias e ajustes na frontend. |
 
 ---
 
@@ -17,7 +17,7 @@
 - Node.js instalado
 - Git
 - Stripe CLI
-- ngrok (para expor o servidor publicamente)
+- ngrok (para expor o servidor publicamente e a escolha é opcional)
 
 Para conferir no terminal nos sistemas Unix-like (Linux e macOS) ou gitbash do Windows, use o comando:
 
