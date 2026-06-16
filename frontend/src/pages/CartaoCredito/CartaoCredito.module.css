@@ -1,0 +1,136 @@
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--container-padding);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.step {
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: 2px solid #000;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--card-bg);
+  color: var(--text-dark);
+}
+
+.cardPill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--card-bg);
+  border-radius: 30px;
+  border: 1px solid #000;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  margin-bottom: var(--space-xl);
+}
+
+.cardNum {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-family: 'Courier New', monospace;
+  color: var(--text-dark);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.inputLarge {
+  height: 56px;
+  background: var(--input-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 16px;
+  font-size: 18px;
+  outline: none;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  color: var(--text-dark);
+}
+
+.inputLarge::placeholder {
+  color: #999;
+}
+
+.input {
+  height: 48px;
+  background: var(--input-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font-size: 16px;
+  outline: none;
+  color: var(--text-dark);
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+.submitBtn {
+  grid-column: 1 / -1;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--btn-action);
+  color: var(--text-light);
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: var(--space-md);
+  transition: background 0.2s;
+}
+
+.submitBtn:hover {
+  background: var(--btn-action-hover);
+}
+
+@media (max-width: 600px) {
+  .form { grid-template-columns: 1fr; }
+  .fieldFull { grid-column: 1; }
+  .submitBtn { grid-column: 1; }
+  .step { font-size: 12px; padding: 8px 16px; }
+  .cardNum { font-size: 16px; }
+}

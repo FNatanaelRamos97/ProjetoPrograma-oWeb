@@ -1,0 +1,722 @@
+/* ── Page Background ── */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #90aeeb 0%, #c6d6ff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.btnContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.otherMethodBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bgCircle1,
+.bgCircle2,
+.bgCircle3 {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bgCircle1 {
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(37,99,255,0.08) 0%, transparent 70%);
+}
+
+.bgCircle2 {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(0,185,107,0.06) 0%, transparent 70%);
+}
+
+.bgCircle3 {
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  right: 30%;
+  background: radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%);
+}
+
+/* ── Container ── */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Main Card ── */
+.card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 28px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 48px;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Left Column ── */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.headerIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #2563ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.headerSub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+/* ── Error Alert ── */
+.error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ── Method Selector ── */
+.methodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.methodCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.methodCard:hover {
+  background: #f0f4ff;
+}
+
+.methodCardActive {
+  background: #eef2ff;
+  border-color: #2563ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 255, 0.15);
+}
+
+.methodIcon {
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.methodCardActive .methodIcon {
+  color: #2563ff;
+}
+
+.methodLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.methodCardActive .methodLabel {
+  color: #2563ff;
+}
+
+.methodDesc {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.methodCardActive .methodDesc {
+  color: #6b7280;
+}
+
+/* ── Other method box (PIX / PayPal / Boleto) ── */
+.otherMethodBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.otherMethodIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #2563ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otherMethodTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.otherMethodDesc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.otherMethodBtn {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 14px;
+  background: #2563ff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.otherMethodBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Input Wrapper */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  color: #9ca3af;
+  pointer-events: none;
+  transition: color 0.25s;
+}
+
+.inputWrapper:focus-within .inputIcon {
+  color: #2563ff;
+}
+
+.input {
+  width: 100%;
+  height: 56px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 0 16px 0 44px;
+  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #111827;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  border-color: #2563ff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 255, 0.12);
+  background: #fff;
+}
+
+/* Error state */
+.inputError .inputIcon {
+  color: #ef4444;
+}
+
+.inputError .input {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Row 2 fields */
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Segmented Control */
+.segmented {
+  display: flex;
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.segOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.segActive {
+  background: #2563ff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 255, 0.2);
+}
+
+/* Select */
+.selectWrapper {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  height: 56px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 0 44px 0 16px;
+  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.25s;
+}
+
+.select:focus {
+  border-color: #2563ff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 255, 0.12);
+  background: #fff;
+}
+
+.selectIcon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+/* Buttons */
+.btnRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.submitBtn,
+.pixBtn {
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.submitBtn {
+  background: #2563ff;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 99, 255, 0.3);
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 255, 0.4);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.pixBtn {
+  background: #00b96b;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 185, 107, 0.25);
+}
+
+.pixBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 185, 107, 0.35);
+}
+
+.pixBtn:active {
+  transform: scale(0.98);
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Security card */
+.securityCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 4px;
+}
+
+.securityIcon {
+  color: #2563ff;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.securityTitle {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.securityText {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Right Column ── */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Card Preview 3D */
+.cardPreview {
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2563ff 0%, #4f46e5 45%, #7c3aed 100%);
+  box-shadow:
+    0 20px 40px rgba(37, 99, 255, 0.25),
+    0 8px 20px rgba(124, 58, 237, 0.2);
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #fff;
+}
+
+.cardShine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.12) 48%,
+    rgba(255, 255, 255, 0.08) 52%,
+    transparent 57%
+  );
+  animation: shine 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.cardChip {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 40px;
+  height: 28px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+}
+
+.cardNumber {
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  font-family: 'Courier New', monospace;
+}
+
+.cardBottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardLabel {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.cardValue {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+/* Brands */
+.brandsRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  padding: 6px 14px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.brandActive {
+  background: #eef2ff;
+  border-color: #2563ff;
+  color: #2563ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 255, 0.15);
+}
+
+/* Summary */
+.summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summaryTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px;
+  }
+
+  .cardPreview {
+    height: 180px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 16px 32px;
+  }
+
+  .card {
+    padding: 24px;
+    border-radius: 22px;
+    gap: 24px;
+  }
+
+  .headerTitle {
+    font-size: 19px;
+  }
+
+  .methodGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .input {
+    height: 50px;
+    font-size: 14px;
+    padding-left: 40px;
+  }
+
+  .row2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .btnRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .submitBtn {
+    height: 52px;
+    font-size: 14px;
+  }
+
+  .cardPreview {
+    height: 160px;
+    padding: 18px;
+  }
+
+  .cardNumber {
+    font-size: 17px;
+  }
+}

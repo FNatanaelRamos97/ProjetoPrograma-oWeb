@@ -1,0 +1,438 @@
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: #1a1a2e;
+}
+
+.pageContent {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+/* Top Bar */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+.backBtn, .shareBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.backBtn:hover, .shareBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.topTitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Card */
+.card {
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.profileRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #2a2a4a;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.avatarOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.avatar:hover .avatarOverlay {
+  opacity: 1;
+}
+
+.uploadHidden {
+  display: none;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  flex: 1;
+  padding-top: 4px;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.checkIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.profileName {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.profileMeta {
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Nível Row */
+.nivelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.nivelLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nivelLabel {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.nivelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.shieldIcon {
+  font-size: 14px;
+}
+
+.saibaMais {
+  background: none;
+  border: none;
+  color: #a78bfa;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.saibaMais:hover {
+  opacity: 0.8;
+}
+
+/* Progress Bar */
+.progressBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.progressSeg {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progressFilled {
+  background: #a78bfa;
+}
+
+/* Platform Since */
+.platformSince {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.calendarIcon {
+  font-size: 14px;
+}
+
+/* Verificações */
+.verificacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.verItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.verOk {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.verPending {
+  background: rgba(255, 255, 255, 0.08);
+  color: #475569;
+}
+
+.verLabel {
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+/* Section Title */
+.sectionTitle {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Histórico Card */
+.histCard {
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.histNumber {
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.histNumBig {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.histDesc {
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Service Count */
+.serviceCount {
+  color: #94a3b8;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* Service List */
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.serviceCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.serviceCard:hover {
+  background: #1a2744;
+}
+
+.serviceCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #2a2a4a;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.serviceCircleImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.serviceInfo {
+  flex: 1;
+}
+
+.serviceName {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+
+.servicePrice {
+  color: #22c55e;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.empty {
+  color: #94a3b8;
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .pageContent {
+    padding: 0 12px 32px;
+  }
+}
+
+/* ── Reviews ── */
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.reviewCard {
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.reviewAuthor {
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reviewStars {
+  display: flex;
+  gap: 1px;
+  font-size: 14px;
+}
+
+.starFilled {
+  color: #f59e0b;
+}
+
+.starEmpty {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.reviewComment {
+  color: #94a3b8;
+  font-size: 13px;
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.reviewDate {
+  color: #475569;
+  font-size: 11px;
+}

@@ -1,0 +1,6 @@
+Número do cartão	Bandeira	Resultado
+4242 4242 4242 4242	Visa	Pagamento aprovado
+4000 0000 0000 0002	Visa	Pagamento recusado
+5555 5555 5555 4444	Mastercard	Pagamento aprovado
+2223 0000 0000 0009	Mastercard	Pagamento aprovado
+3782 822463 10005	Amex	Pagamento aprovado

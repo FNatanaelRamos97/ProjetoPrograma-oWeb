@@ -1,0 +1,233 @@
+/* ── LAYOUT ── */
+.wrapper {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+}
+
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 0 16px;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  padding: 0 8px;
+}
+
+.sidebarGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebarGroupLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0 14px 6px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebarItem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border-radius: 8px;
+}
+
+.sidebarItem:hover::before {
+  opacity: 1;
+}
+
+.sidebarItem:hover {
+  color: var(--color-text);
+}
+
+.sidebarItemActive {
+  color: var(--color-primary) !important;
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.sidebarItemActive::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), transparent 60%);
+}
+
+.sidebarIndicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-primary);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.sidebarIcon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.sidebarItemActive .sidebarIcon {
+  opacity: 1;
+}
+
+.sidebarLabel {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebarStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+  flex-shrink: 0;
+}
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.headerTitle {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.headerSubtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 6px 0 0;
+}
+
+.dateSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.dateSelector:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1200px) {
+  .sidebar { width: 200px; min-width: 200px; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { padding: 20px; }
+  .header { flex-direction: column; gap: 12px; }
+  .headerTitle { font-size: 22px; }
+}
+
+.tableList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  font-size: 13px;
+}
+
+.tableRow span:last-child {
+  color: rgba(255, 255, 255, 0.55);
+}

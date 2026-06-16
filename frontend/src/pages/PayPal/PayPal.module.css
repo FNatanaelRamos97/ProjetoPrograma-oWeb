@@ -1,0 +1,251 @@
+.page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(0, 130, 220, 0.2), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0, 150, 230, 0.15), transparent 35%),
+    linear-gradient(135deg, #90aeeb, #c6d6ff);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 16px 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 30px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+  padding: 36px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  animation: cardIn 0.4s ease-out;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.headerIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #0070ba;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paypalLetter {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: -12px 0 0;
+  line-height: 1.4;
+  max-width: 380px;
+}
+
+.paypalBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #f0f8ff;
+  border: 1px solid #b8d8f0;
+  border-radius: 16px;
+}
+
+.paypalLogo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0070ba;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.paypalTag {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0070ba;
+  background: rgba(0, 112, 186, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.redirectBtn {
+  width: 100%;
+  height: 60px;
+  border: none;
+  border-radius: 18px;
+  background: #0070ba;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 112, 186, 0.3);
+  transition: all 0.25s;
+}
+
+.redirectBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 112, 186, 0.4);
+}
+
+.redirectBtn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.successBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 16px;
+  width: 100%;
+}
+
+.successIcon {
+  color: #00b96b;
+}
+
+.successText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.confirmBtn {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #00b96b, #00a35f);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 185, 107, 0.3);
+  transition: all 0.25s;
+}
+
+.confirmBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 185, 107, 0.4);
+}
+
+.infoCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  background: #eff6ff;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: left;
+}
+
+.infoIcon {
+  color: #2563ff;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.infoText {
+  font-size: 13px;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.security {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding-top: 4px;
+  border-top: 1px solid #f0f0f0;
+  text-align: left;
+}
+
+.securityIcon {
+  color: #2563ff;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.securityTitle {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.securityText {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .container { padding: 12px 16px; }
+  .card { padding: 28px 24px; gap: 20px; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 8px 12px; }
+  .card { padding: 20px 18px; border-radius: 24px; gap: 16px; }
+  .redirectBtn,
+  .confirmBtn { height: 54px; font-size: 15px; }
+}
